@@ -26,3 +26,8 @@
     text-align: center;
     min-height: 600px;
 }
+
+.charts
+{
+    min-width: 450px;
+}

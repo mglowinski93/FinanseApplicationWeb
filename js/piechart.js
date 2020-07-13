@@ -54,4 +54,5 @@ function drawChart() {
 
 	var chart = new google.visualization.PieChart(document.getElementById('piechart'));
 	chart.draw(data, options);
+	window.addEventListener('resize', drawChart, false);
 }
