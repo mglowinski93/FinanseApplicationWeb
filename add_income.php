@@ -22,6 +22,10 @@ if (isset($_SESSION['logged_id']))
 			echo '<span style="color:red;">Server error. Sorry for inconvenience!</span>';
 			exit();
 		}
+		else
+		{
+			$_POST['income_added'] = true;
+		}
 	}
 	$income_category_query = $db->prepare('SELECT id, name FROM incomes_category_assigned_to_users WHERE user_id = :user_id');
 	$income_category_query->bindValue(':user_id', $_SESSION['logged_id'], PDO::PARAM_STR);
@@ -141,6 +145,20 @@ else
     <main>
         <div class="container">
           <div class="py-5 text-center">
+		  	<?php
+				if (isset($_POST['income_added']))
+				{
+					echo '
+						<div class="alert alert-success" role="alert">
+						  Income successfully added
+						  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						  </button>
+						</div>
+					';
+					unset($_POST['income_added']);
+				}
+			?>
             <h2>Add income</h2>
             <p class="lead">Fill-in below form to add income</p>
           </div>
