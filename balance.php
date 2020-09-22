@@ -92,7 +92,59 @@ else
 
     <script type="text/javascript" src="js/main.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="js/piechart.js"></script>
+    
+	<script type="text/javascript">
+		google.charts.load("current", {packages:["corechart"]});
+		google.charts.setOnLoadCallback(drawChart);
+		function drawChart() {
+			var data = google.visualization.arrayToDataTable([
+			  ['Expenses', 'Amount (in PLN)'],
+			  <?php
+				foreach ($expenses as $expense)
+				{
+				  echo "['".$expense['name']."', ".$expense['SUM(expenses.amount)']."],";
+				}
+			  ?>
+			]);
+
+		  var options = {
+			pieSliceText: 'label',
+			title: 'Your expenses',
+			pieStartAngle: 100,
+			backgroundColor: 'smokewhite',
+			titleTextStyle: {
+				color: 'black'
+			},
+			hAxis: {
+				textStyle: {
+					color: 'black'
+				},
+				titleTextStyle: {
+					color: 'black'
+				}
+			},
+			vAxis: {
+				textStyle: {
+					color: 'black'
+				},
+				titleTextStyle: {
+					color: 'black'
+				}
+			},
+			legend: {
+				textStyle: {
+					color: 'black'
+				}
+			}
+		  };
+
+			var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+			chart.draw(data, options);
+			window.addEventListener('resize', drawChart, false);
+		}
+
+	</script>
+	
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
