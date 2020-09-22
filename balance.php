@@ -1,3 +1,78 @@
+<?php
+
+session_start();
+
+if (isset($_SESSION['logged_id']))
+{
+	require_once 'database.php';
+	if(isset($_GET['startDate']) && isset($_GET['endDate']))
+	{	
+		$start_date = $_GET['startDate'];
+		$end_date = $_GET['endDate'];
+		$user_id = $_SESSION['logged_id'];
+		
+		$expenses_query = "SELECT expenses_category_assigned_to_users.name, SUM(expenses.amount) FROM expenses INNER JOIN expenses_category_assigned_to_users ON expenses.expense_category_assigned_to_user_id=expenses_category_assigned_to_users.id WHERE expenses.date_of_expense BETWEEN :start_date AND :end_date AND expenses.user_id = :user_id GROUP BY expenses.expense_category_assigned_to_user_id";
+		$stmt_expenses= $db->prepare($expenses_query);
+		$stmt_expenses->bindParam(':start_date', $start_date);
+		$stmt_expenses->bindParam(':end_date', $end_date);
+		$stmt_expenses->bindParam(':user_id',$user_id);
+		
+		if($stmt_expenses->execute() == false)
+		{
+			echo '<span style="color:red;">Server error. Sorry for inconvenience!</span>';
+			exit();
+		}
+		else
+		{
+			$expenses = $stmt_expenses->fetchAll();
+		}
+		
+		$incomes_query = "SELECT incomes_category_assigned_to_users.name, SUM(incomes.amount) FROM incomes INNER JOIN incomes_category_assigned_to_users ON incomes.income_category_assigned_to_user_id=incomes_category_assigned_to_users.id WHERE incomes.date_of_income BETWEEN :start_date AND :end_date AND incomes.user_id = :user_id GROUP BY incomes.income_category_assigned_to_user_id";
+		$stmt_incomes= $db->prepare($incomes_query);
+		$stmt_incomes->bindParam(':start_date', $start_date);
+		$stmt_incomes->bindParam(':end_date', $end_date);
+		$stmt_incomes->bindParam(':user_id', $user_id);
+
+		if($stmt_incomes->execute() == false)
+		{
+			echo '<span style="color:red;">Server error. Sorry for inconvenience!</span>';
+			exit();
+		}
+		else
+		{
+			$incomes = $stmt_incomes->fetchAll();
+		}
+		
+		
+		$summary_query = "SELECT (SELECT SUM(amount) FROM incomes WHERE user_id = :income_user_id and date_of_income BETWEEN :income_start_date and :income_end_date) - (SELECT SUM(amount) FROM expenses WHERE user_id = :expense_user_id and date_of_expense BETWEEN :expense_start_date and :expense_end_date)";
+		$stmt_summary= $db->prepare($summary_query);
+		$stmt_summary->bindParam(':income_start_date', $start_date);
+		$stmt_summary->bindParam(':income_end_date', $end_date);
+		$stmt_summary->bindParam(':income_user_id', $user_id);
+		$stmt_summary->bindParam(':expense_start_date', $start_date);
+		$stmt_summary->bindParam(':expense_end_date', $end_date);
+		$stmt_summary->bindParam(':expense_user_id', $user_id);
+
+		if($stmt_summary->execute() == false)
+		{
+			echo '<span style="color:red;">Server error. Sorry for inconvenience!</span>';
+			exit();
+		}
+		else
+		{
+			$summary = $stmt_summary->fetch();
+			$balance = $summary["(SELECT SUM(amount) FROM incomes WHERE user_id = ? and date_of_income BETWEEN ? and ?) - (SELECT SUM(amount) FROM expenses WHERE user_id = ? and date_of_expense BETWEEN ? and ?)"];
+		}
+		
+	}
+}
+else
+{
+	header('Location: login.php');
+}
+
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -50,17 +125,17 @@
               <li class="nav-item active dropdown">
                 <a class="nav-link dropdown-toggle" href="http://example.com" id="balanceDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-chart-bar"></i>  View balance</a>
                 <div class="dropdown-menu" aria-labelledby="balanceDropdown">
-                  <a class="dropdown-item" href="#">Current month</a>
-                  <a class="dropdown-item" href="#">Last month</a>
-                  <a class="dropdown-item" href="#">Current Year</a>
-                  <a class="dropdown-item" href="#userDefinedBalanceDatesModal" data-toggle="modal" data-target="#userDefinedBalanceDatesModal">User definer period</a>
+                <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-01')."&endDate=".date("Y-m-t")?>">Current month</a>
+                <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-d', mktime(0, 0, 0, date('m')-1, 1))."&endDate=".date('Y-m-d', mktime(0, 0, 0, date('m'), 0))?>">Last month</a>
+                <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-01-01')."&endDate=".date('Y-12-31')?>">Current Year</a>
+                <a class="dropdown-item" href="#userDefinedBalanceDatesModal" data-toggle="modal" data-target="#userDefinedBalanceDatesModal">User definer period</a>
                 </div>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#"><i class="icon-wrench"></i>  Settings</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#"><i class="icon-logout"></i>  Logout</a>
+                <a class="nav-link" href="logout.php"><i class="icon-logout"></i>  Logout</a>
               </li>
             </ul>
           </div>
@@ -75,17 +150,17 @@
                   <h4 class="col-12 modal-title">Chose dates to display balance</h4>
                 </div>
                 <div class="modal-body">
-                    <form class="form-income">
+                    <form class="form-income" action="./balance.php" method="get">
                         <div class="form-group row">
                           <label for="balanceStartingDate" class="col-sm-3 col-form-label">Start date</label>
                           <div class="col-sm-8">
-                            <input type="date" class="form-control" id="balanceStartingDate" required>
+                            <input type="date" class="form-control" id="balanceStartingDate" name="startDate" required>
                           </div>
                         </div>
                         <div class="form-group row">
                           <label for="balanceEndingDate" class="col-sm-3 col-form-label">End Date</label>
                           <div class="col-sm-8">
-                            <input type="date" class="form-control" id="balanceEndingDate" required>
+                            <input type="date" class="form-control" id="balanceEndingDate" name="endDate" required>
                           </div>
                         </div>
                         <div class="form-group row">
@@ -115,22 +190,17 @@
                   <p class="lead">Incomes</p>
                     <table class="table table-striped">
                       <tbody>
-                        <tr>
-                          <td>Salaries</td>
-                          <td>10000</td>
-                        </tr>
-                        <tr>
-                          <td>Bank Interest</td>
-                          <td>200</td>
-                        </tr>
-                        <tr>
-                          <td>Allegro sale</td>
-                          <td>1000</td>
-                        </tr>
-                        <tr>
-                          <td>Other</td>
-                          <td>3000</td>
-                        </tr>
+						<?php
+							foreach ($incomes as $income)
+							{
+							  echo'
+								<tr>
+								  <td>'.$income['name'].'</td>
+								  <td>'.$income['SUM(incomes.amount)'].'</td>
+								</tr>
+								  ';
+							}
+						?>
                       </tbody>
                     </table>
               </div>
@@ -138,70 +208,17 @@
                   <p class="lead">Expenses</p>
                   <table class="table table-striped">
                       <tbody>
-                        <tr>
-                          <td>Savings</td>
-                          <td>2000</td>
-                        </tr>
-                        <tr>
-                          <td>Children</td>
-                          <td>1500</td>
-                        </tr>
-                        <tr>
-                          <td>Rent</td>
-                          <td>1000</td>
-                        </tr>
-                        <tr>
-                          <td>Travels</td>
-                          <td>1000</td>
-                        </tr>
-                        <tr>
-                            <td>Pensions</td>
-                            <td>1000</td>
-                            </tr>
-                        <tr>
-                            <td>Food</td>
-                            <td>700</td>
-                        </tr>
-                        <tr>
-                            <td>Transport</td>
-                            <td>500</td>
-                        </tr>
-                        <tr>
-                            <td>Entertainments</td>
-                            <td>500</td>
-                        </tr>
-                        <tr>
-                            <td>Clothes</td>
-                            <td>300</td>
-                        </tr>
-                        <tr>
-                            <td>Hygiene</td>
-                            <td>200</td>
-                        </tr>
-                        <tr>
-                            <td>Books</td>
-                            <td>100</td>
-                        </tr>
-                        <tr>
-                            <td>Telecommunication</td>
-                            <td>50</td>
-                        </tr>
-                        <tr>
-                            <td>Others</td>
-                            <td>30</td>
-                        </tr>
-                        <tr>
-                            <td>Healthcare</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td>Repayment of debts</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td>Donations</td>
-                            <td>0</td>
-                        </tr>
+					  	<?php
+							foreach ($expenses as $expense)
+							{
+							  echo'
+								<tr>
+								  <td>'.$expense['name'].'</td>
+								  <td>'.$expense['SUM(expenses.amount)'].'</td>
+								</tr>
+								  ';
+							}
+						?>
                       </tbody>
                    </table>
               </div>
@@ -209,8 +226,17 @@
           <div class="row" id="balanceSummary">
               <div class="col">
                   <p class="lead">Summary</p>
-                  <p style="">Balance: 5320 PLN</p>
-                  <p style="color: green">Great! You manage your finances well</p>
+                  <p style="">Balance: <?= $balance ?> PLN</p>
+				  <?php
+					if($balance>=0)
+					{
+						echo '<p style="color: green">Great! You manage your finances well</p>';
+					}
+					else
+					{
+						echo '<p style="color: red">Too bad! You must think about reducing expenses</p>';
+					}
+				  ?>
               </div>
           </div>
           <div class="row charts" id="piechartSummary">
