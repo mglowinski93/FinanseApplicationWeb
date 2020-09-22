@@ -25,6 +25,8 @@ if (isset($_SESSION['logged_id']))
 		else
 		{
 			$_POST['income_added'] = true;
+			unset($_POST['income_value']);
+			unset($_POST['incomeCategory']);
 		}
 	}
 	$income_category_query = $db->prepare('SELECT id, name FROM incomes_category_assigned_to_users WHERE user_id = :user_id');

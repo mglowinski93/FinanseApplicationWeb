@@ -27,6 +27,8 @@ if (isset($_SESSION['logged_id']))
 		{
 			$_POST['expense_added'] = true;
 		}
+		unset($_POST['expense_value']);
+		unset($_POST['expenseCategory']);
 	}
 	$expense_category_query = $db->prepare('SELECT id, name FROM expenses_category_assigned_to_users WHERE user_id = :user_id');
 	$expense_category_query->bindValue(':user_id', $_SESSION['logged_id'], PDO::PARAM_STR);
