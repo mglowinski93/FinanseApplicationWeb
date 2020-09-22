@@ -61,7 +61,7 @@ if (isset($_SESSION['logged_id']))
 		else
 		{
 			$summary = $stmt_summary->fetch();
-			$balance = $summary["(SELECT SUM(amount) FROM incomes WHERE user_id = ? and date_of_income BETWEEN ? and ?) - (SELECT SUM(amount) FROM expenses WHERE user_id = ? and date_of_expense BETWEEN ? and ?)"];
+			$balance = $summary[0];
 		}
 		
 	}
