@@ -5,7 +5,7 @@ session_start();
 if (isset($_SESSION['logged_id']))
 {
 	require_once 'database.php';
-	if(isset($_POST['income_value']))
+	if(isset($_POST['income_value']) && isset($_POST['incomeCategory']))
 	{
 		$user_data = [
 			'user_id' => $_SESSION['logged_id'],
@@ -186,7 +186,7 @@ else
 						{
 						  echo'
 						  <div class="form-check">
-							<input class="form-check-input" type="radio" name="incomeCategory" id="'.$income_category["name"].'" value='.$income_category["id"].'>
+							<input required class="form-check-input" type="radio" name="incomeCategory" id="'.$income_category["name"].'" value='.$income_category["id"].'>
 							<label class="form-check-label" for="'.$income_category["name"].'">
 							  '.$income_category["name"].'
 							</label>
