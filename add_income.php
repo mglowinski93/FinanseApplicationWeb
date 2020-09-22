@@ -1,3 +1,47 @@
+<?php
+
+session_start();
+
+if (isset($_SESSION['logged_id']))
+{
+	require_once 'database.php';
+	if(isset($_POST['income_value']) && isset($_POST['incomeCategory']))
+	{
+		$user_data = [
+			'user_id' => $_SESSION['logged_id'],
+			'income_category_assigned_to_user_id' => $_POST['incomeCategory'],
+			'amount' => $_POST['income_value'],
+			'date_of_income' => $_POST['income_date'],
+			'income_comment' => $_POST['income_comment']
+		];
+		$insert_query = "INSERT INTO incomes (id, user_id, income_category_assigned_to_user_id, amount, date_of_income, income_comment) VALUES (NULL, :user_id, :income_category_assigned_to_user_id, :amount, :date_of_income, :income_comment)";
+		$stmt= $db->prepare($insert_query);
+
+		if($stmt->execute($user_data) == false)
+		{
+			echo '<span style="color:red;">Server error. Sorry for inconvenience!</span>';
+			exit();
+		}
+		else
+		{
+			$_POST['income_added'] = true;
+			unset($_POST['income_value']);
+			unset($_POST['incomeCategory']);
+		}
+	}
+	$income_category_query = $db->prepare('SELECT id, name FROM incomes_category_assigned_to_users WHERE user_id = :user_id');
+	$income_category_query->bindValue(':user_id', $_SESSION['logged_id'], PDO::PARAM_STR);
+	$income_category_query->execute();
+    $income_categories = $income_category_query->fetchAll();
+
+}
+else
+{
+	header('Location: login.php');
+}
+
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -47,9 +91,9 @@
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="http://example.com" id="balanceDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-chart-bar"></i>  View balance</a>
                 <div class="dropdown-menu" aria-labelledby="balanceDropdown">
-                  <a class="dropdown-item" href="#">Current month</a>
-                  <a class="dropdown-item" href="#">Last month</a>
-                  <a class="dropdown-item" href="#">Current Year</a>
+                  <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-01')."&endDate=".date("Y-m-t")?>">Current month</a>
+                  <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-d', mktime(0, 0, 0, date('m')-1, 1))."&endDate=".date('Y-m-d', mktime(0, 0, 0, date('m'), 0))?>">Last month</a>
+                  <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-01-01')."&endDate=".date('Y-12-31')?>">Current Year</a>
                   <a class="dropdown-item" href="#userDefinedBalanceDatesModal" data-toggle="modal" data-target="#userDefinedBalanceDatesModal">User definer period</a>
                 </div>
               </li>
@@ -57,7 +101,7 @@
                 <a class="nav-link" href="#"><i class="icon-wrench"></i>  Settings</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#"><i class="icon-logout"></i>  Logout</a>
+                <a class="nav-link" href="logout.php"><i class="icon-logout"></i>  Logout</a>
               </li>
             </ul>
           </div>
@@ -72,17 +116,17 @@
                   <h4 class="col-12 modal-title">Chose dates to display balance</h4>
                 </div>
                 <div class="modal-body">
-                    <form class="form-income">
+                    <form class="form-income" action="./balance.php" method="get">
                         <div class="form-group row">
                           <label for="balanceStartingDate" class="col-sm-3 col-form-label">Start date</label>
                           <div class="col-sm-8">
-                            <input type="date" class="form-control" id="balanceStartingDate" required>
+                            <input type="date" class="form-control" id="balanceStartingDate" name="startDate" required>
                           </div>
                         </div>
                         <div class="form-group row">
                           <label for="balanceEndingDate" class="col-sm-3 col-form-label">End Date</label>
                           <div class="col-sm-8">
-                            <input type="date" class="form-control" id="balanceEndingDate" required>
+                            <input type="date" class="form-control" id="balanceEndingDate" name="endDate" required>
                           </div>
                         </div>
                         <div class="form-group row">
@@ -103,60 +147,67 @@
     <main>
         <div class="container">
           <div class="py-5 text-center">
+		  	<?php
+				if (isset($_POST['income_added']))
+				{
+					echo '
+						<div class="alert alert-success" role="alert">
+						  Income successfully added
+						  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						  </button>
+						</div>
+					';
+					unset($_POST['income_added']);
+				}
+			?>
             <h2>Add income</h2>
             <p class="lead">Fill-in below form to add income</p>
           </div>
-
           <div class="row">
             <div class="col justify-content-center">
-              <form class="form-income">
+              <form class="form-income" method="post">
                 <div class="form-group row">
                   <label for="incomeValue" class="col-sm-2 col-form-label">Value</label>
                   <div class="col-sm-10">
-                    <input type="number" class="form-control" id="incomeValue" placeholder="100" required>
+                    <input type="number" class="form-control" id="incomeValue" name="income_value" placeholder="100" required>
                   </div>
                 </div>
                 <div class="form-group row">
                   <label for="incomeComment" class="col-sm-2 col-form-label">Comment</label>
                   <div class="col-sm-10">
-                    <textarea class="form-control" id="incomeComment" placeholder="" rows="3"></textarea>
+                    <textarea class="form-control" id="incomeComment" name="income_comment" placeholder="" rows="3"></textarea>
                   </div>
                 </div>
                 <fieldset class="form-group">
                   <div class="row">
                     <legend class="col-form-label col-sm-2 pt-0">Category</legend>
                     <div class="col-sm-10">
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="incomeCategory" id="salaryIncomeCategory" value="salary" checked>
-                        <label class="form-check-label" for="salaryIncomeCategory">
-                          Salary
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="incomeCategory" id="bankInterestIncomeCategory" value="bankInterest">
-                        <label class="form-check-label" for="bankInterestIncomeCategory">
-                          Bank interest
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="incomeCategory" id="allegroSaleIncomeCategory" value="allegroSale">
-                        <label class="form-check-label" for="allegroSaleIncomeCategory">
-                          Allegro sale
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="incomeCategory" id="otherIncomeCategory" value="other">
-                        <label class="form-check-label" for="otherIncomeCategory">
-                          Other
-                        </label>
-                      </div>
+					  <?php
+						foreach ($income_categories as $income_category)
+						{
+						  $checked = '';
+						  if($income_category["name"] == "Salary")
+						  {
+							  $checked = 'checked ';
+						  }
+						  echo'
+						  <div class="form-check">
+							<input required '.$checked.'class="form-check-input" type="radio" name="incomeCategory" id="'.$income_category["name"].'" value='.$income_category["id"].'>
+							<label class="form-check-label" for="'.$income_category["name"].'">
+							  '.$income_category["name"].'
+							</label>
+						  </div>
+						  ';
+						}
+					  ?>
                     </div>
                   </div>
                 </fieldset>
                 <div class="form-group row">
                   <label for="incomeDate" class="col-sm-2 col-form-label">Date</label>
                   <div class="col-sm-5">
-                    <input type="date" class="form-control" id="incomeDate" required>
+                    <input type="date" class="form-control" id="incomeDate" name="income_date" required>
                   </div>
                 </div>
                 <div class="form-group row">

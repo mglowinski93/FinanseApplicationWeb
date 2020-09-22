@@ -1,3 +1,52 @@
+<?php
+
+session_start();
+
+if (isset($_SESSION['logged_id']))
+{
+	require_once 'database.php';
+	if(isset($_POST['expense_value']) && isset($_POST['expenseCategory']))
+	{
+		$user_data = [
+			'user_id' => $_SESSION['logged_id'],
+			'expense_category_assigned_to_user_id' => $_POST['expenseCategory'],
+			'payment_method_assigned_to_user_id' => $_POST['paymentType'],
+			'amount' => $_POST['expense_value'],
+			'date_of_expense' => $_POST['expense_date'],
+			'expense_comment' => $_POST['expense_comment']
+		];
+		$insert_query = "INSERT INTO expenses (id, user_id, expense_category_assigned_to_user_id, payment_method_assigned_to_user_id, amount, date_of_expense, expense_comment) VALUES (NULL, :user_id, :expense_category_assigned_to_user_id, :payment_method_assigned_to_user_id, :amount, :date_of_expense, :expense_comment)";
+		$stmt= $db->prepare($insert_query);
+
+		if($stmt->execute($user_data) == false)
+		{
+			echo '<span style="color:red;">Server error. Sorry for inconvenience!</span>';
+			exit();
+		}
+		else
+		{
+			$_POST['expense_added'] = true;
+		}
+		unset($_POST['expense_value']);
+		unset($_POST['expenseCategory']);
+	}
+	$expense_category_query = $db->prepare('SELECT id, name FROM expenses_category_assigned_to_users WHERE user_id = :user_id');
+	$expense_category_query->bindValue(':user_id', $_SESSION['logged_id'], PDO::PARAM_STR);
+	$expense_category_query->execute();
+    $expense_categories = $expense_category_query->fetchAll();
+	
+	$payment_category_query = $db->prepare('SELECT id, name FROM payment_methods_assigned_to_users WHERE user_id = :user_id');
+	$payment_category_query->bindValue(':user_id', $_SESSION['logged_id'], PDO::PARAM_STR);
+	$payment_category_query->execute();
+    $payment_categories = $payment_category_query->fetchAll();
+}
+else
+{
+	header('Location: login.php');
+}
+
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -47,9 +96,9 @@
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="http://example.com" id="balanceDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-chart-bar"></i>  View balance</a>
               <div class="dropdown-menu" aria-labelledby="balanceDropdown">
-                <a class="dropdown-item" href="#">Current month</a>
-                <a class="dropdown-item" href="#">Last month</a>
-                <a class="dropdown-item" href="#">Current Year</a>
+                <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-01')."&endDate=".date("Y-m-t")?>">Current month</a>
+                <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-d', mktime(0, 0, 0, date('m')-1, 1))."&endDate=".date('Y-m-d', mktime(0, 0, 0, date('m'), 0))?>">Last month</a>
+                <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-01-01')."&endDate=".date('Y-12-31')?>">Current Year</a>
                 <a class="dropdown-item" href="#userDefinedBalanceDatesModal" data-toggle="modal" data-target="#userDefinedBalanceDatesModal">User definer period</a>
               </div>
             </li>
@@ -57,7 +106,7 @@
               <a class="nav-link" href="#"><i class="icon-wrench"></i>  Settings</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#"><i class="icon-logout"></i>  Logout</a>
+              <a class="nav-link" href="logout.php"><i class="icon-logout"></i>  Logout</a>
             </li>
           </ul>
         </div>
@@ -73,17 +122,17 @@
               <h4 class="col-12 modal-title">Chose dates to display balance</h4>
             </div>
             <div class="modal-body">
-                <form class="form-income">
+                <form class="form-income" action="./balance.php" method="get">
                     <div class="form-group row">
                       <label for="balanceStartingDate" class="col-sm-3 col-form-label">Start date</label>
                       <div class="col-sm-8">
-                        <input type="date" class="form-control" id="balanceStartingDate" required>
+                        <input type="date" class="form-control" id="balanceStartingDate" name="startDate" required>
                       </div>
                     </div>
                     <div class="form-group row">
                       <label for="balanceEndingDate" class="col-sm-3 col-form-label">End Date</label>
                       <div class="col-sm-8">
-                        <input type="date" class="form-control" id="balanceEndingDate" required>
+                        <input type="date" class="form-control" id="balanceEndingDate" name="endDate" required>
                       </div>
                     </div>
                     <div class="form-group row">
@@ -104,24 +153,38 @@
     <main>
       <div class="container">
         <div class="py-5 text-center">
+			<?php
+				if (isset($_POST['expense_added']))
+				{
+					echo '
+						<div class="alert alert-success" role="alert">
+						  Expense successfully added
+						  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						  </button>
+						</div>
+					';
+					unset($_POST['expense_added']);
+				}
+			?>
           <h2>Add expense</h2>
           <p class="lead">Fill-in below form to add expense</p>
         </div>
-
+	
         <div class="row">
           <div class="col justify-content-center">
-            <form class="form-expense">
+            <form class="form-expense" method="post">
               <div class="form-group row">
                 <label for="expenseValue" class="col-sm-2 col-form-label">Value</label>
                 <div class="col-sm-10">
-                  <input type="number" class="form-control" id="expenseValue" placeholder="100" required>
+                  <input type="number" class="form-control" id="expenseValue" name="expense_value" placeholder="100" required>
                 </div>
               </div>
 
               <div class="form-group row">
                 <label for="expenseComment" class="col-sm-2 col-form-label">Comment</label>
                 <div class="col-sm-10">
-                  <textarea class="form-control" id="expenseComment" placeholder="" rows="3"></textarea>
+                  <textarea class="form-control" id="expenseComment" name="expense_comment" placeholder="" rows="3"></textarea>
                 </div>
               </div>
 
@@ -129,9 +192,19 @@
                 <label for="paymentTypeSelect" class="col-sm-2 col-form-label">Payment type</label>
                 <div class="col-sm-10">
                   <select class="form-control" name="paymentType" id="paymentTypeSelect">
-                      <option value="cash">Cash</option>
-                      <option value="debitCard" selected>Debit Card</option>
-                      <option value="creditCard">Credit Card</option>
+					<?php				
+						foreach ($payment_categories as $payment_category)
+						{
+						  $selected = '';
+						  if($payment_category["name"] == "Debit Card")
+						  {
+							$selected = 'selected ';
+						  }
+						  echo'
+							   <option '.$selected.'value="'.$payment_category["id"].'">'.$payment_category["name"].'</option>
+						      ';
+						}
+					?>
                   </select>
                 </div>
               </div>
@@ -140,115 +213,31 @@
                 <div class="row">
                   <legend class="col-form-label col-sm-2 pt-0">Category</legend>
                   <div class="col-sm-10">
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="foodExpenseCategory" value="food" checked>
-                      <label class="form-check-label" for="foodExpenseCategory">
-                        Food
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="rentExpenseCategory" value="rent">
-                      <label class="form-check-label" for="rentExpenseCategory">
-                        Rent
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="transportExpenseCategory" value="transport">
-                      <label class="form-check-label" for="transportExpenseCategory">
-                        Transport
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="telecommunicationExpenseCategory" value="telecommunication">
-                      <label class="form-check-label" for="telecommunicationExpenseCategory">
-                        Telecommunication
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="healthcareExpenseCategory" value="healthcare">
-                      <label class="form-check-label" for="healthcareExpenseCategory">
-                        Healthcare
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="clothesExpenseCategory" value="clothes">
-                      <label class="form-check-label" for="clothesExpenseCategory">
-                        Clothes
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="hygieneExpenseCategory" value="hygiene">
-                      <label class="form-check-label" for="hygieneExpenseCategory">
-                        Hygiene
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="childrenExpenseCategory" value="children">
-                      <label class="form-check-label" for="childrenExpenseCategory">
-                        Children
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="entertainmentExpenseCategory" value="entertainment">
-                      <label class="form-check-label" for="entertainmentExpenseCategory">
-                        Entertainment
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="schoolExpenseCategory" value="school">
-                      <label class="form-check-label" for="schoolExpenseCategory">
-                        School
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="travelExpenseCategory" value="travel">
-                      <label class="form-check-label" for="travelExpenseCategory">
-                        Travel
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="bookExpenseCategory" value="book">
-                      <label class="form-check-label" for="bookExpenseCategory">
-                        Book
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="savingsExpenseCategory" value="savings">
-                      <label class="form-check-label" for="savingsExpenseCategory">
-                        Savings
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="pensionExpenseCategory" value="pension">
-                      <label class="form-check-label" for="pensionExpenseCategory">
-                        Pension
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="repaymentOfDebtsExpenseCategory" value="repaymentOfDebts">
-                      <label class="form-check-label" for="repaymentOfDebtsExpenseCategory">
-                        Repayment of debts
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="donationExpenseCategory" value="donation">
-                      <label class="form-check-label" for="donationExpenseCategory">
-                        Donation
-                      </label>
-                    </div>
-                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="expenseCategory" id="otherExpenseCategory" value="other">
-                      <label class="form-check-label" for="otherExpenseCategory">
-                        Other
-                      </label>
-                    </div>
+                    <?php
+						foreach ($expense_categories as $expense_category)
+						{
+						  $checked = '';
+						  if($expense_category["name"] == "Food")
+						  {
+							  $checked = 'checked ';
+						  }
+						  echo'
+						  <div class="form-check">
+							<input required '.$checked.'class="form-check-input" type="radio" name="expenseCategory" id="'.$expense_category["name"].'" value='.$expense_category["id"].'>
+							<label class="form-check-label" for="'.$expense_category["name"].'">
+							  '.$expense_category["name"].'
+							</label>
+						  </div>
+						  ';
+						}
+					?>
                   </div>
                 </div>
               </fieldset>
               <div class="form-group row">
                 <label for="expenseDate" class="col-sm-2 col-form-label">Date</label>
                 <div class="col-sm-5">
-                  <input type="date" class="form-control" id="expenseDate" required>
+                  <input type="date" class="form-control" id="expenseDate" name="expense_date" required>
                 </div>
               </div>
               <div class="form-group row">

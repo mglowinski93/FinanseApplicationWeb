@@ -41,7 +41,7 @@ body {
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-}
+} 
 .form-user-credentials input[type="password"] {
   margin-bottom: -1px;
   border-top-left-radius: 0;
@@ -52,4 +52,11 @@ body {
   margin-bottom: 10px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+.error
+{
+	color:red;
+	margin-top: 10px;
+	margin-botton: 10px;
 }

@@ -1,3 +1,23 @@
+<?php
+
+session_start();
+
+if (isset($_SESSION['logged_id']))
+{
+	require_once 'database.php';
+	$user_query = $db->prepare('SELECT username FROM users WHERE id = :logged_id');
+	$user_query->bindValue(':logged_id', $_SESSION['logged_id'], PDO::PARAM_STR);
+	$user_query->execute();
+	
+	$user = $user_query->fetch();
+	$username = $user['username'];
+}
+else
+{
+	header('Location: login.php');
+}
+?>
+
 <!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
@@ -45,9 +65,9 @@
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="http://example.com" id="balanceDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-chart-bar"></i>  View balance</a>
               <div class="dropdown-menu" aria-labelledby="balanceDropdown">
-                <a class="dropdown-item" href="#">Current month</a>
-                <a class="dropdown-item" href="#">Last month</a>
-                <a class="dropdown-item" href="#">Current Year</a>
+                <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-01')."&endDate=".date("Y-m-t")?>">Current month</a>
+                <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-d', mktime(0, 0, 0, date('m')-1, 1))."&endDate=".date('Y-m-d', mktime(0, 0, 0, date('m'), 0))?>">Last month</a>
+                <a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-01-01')."&endDate=".date('Y-12-31')?>">Current Year</a>
                 <a class="dropdown-item" href="#userDefinedBalanceDatesModal" data-toggle="modal" data-target="#userDefinedBalanceDatesModal">User definer period</a>
               </div>
             </li>
@@ -55,7 +75,7 @@
               <a class="nav-link" href="#"><i class="icon-wrench"></i>  Settings</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#"><i class="icon-logout"></i>  Logout</a>
+              <a class="nav-link" href="logout.php"><i class="icon-logout"></i>  Logout</a>
             </li>
           </ul>
         </div>
@@ -70,17 +90,17 @@
               <h4 class="col-12 modal-title">Chose dates to display balance</h4>
             </div>
             <div class="modal-body">
-                <form class="form-income">
+                <form class="form-income" action="./balance.php" method="get">
                     <div class="form-group row">
                       <label for="balanceStartingDate" class="col-sm-3 col-form-label">Start date</label>
                       <div class="col-sm-8">
-                        <input type="date" class="form-control" id="balanceStartingDate" required>
+                        <input type="date" class="form-control" id="balanceStartingDate" name="startDate" required>
                       </div>
                     </div>
                     <div class="form-group row">
                       <label for="balanceEndingDate" class="col-sm-3 col-form-label">End Date</label>
                       <div class="col-sm-8">
-                        <input type="date" class="form-control" id="balanceEndingDate" required>
+                        <input type="date" class="form-control" id="balanceEndingDate" name="endDate" required>
                       </div>
                     </div>
                     <div class="form-group row">
@@ -101,7 +121,7 @@
     <main role="main">
       <div class="jumbotron jumbotron-fluid" style="background-color: ghostwhite;">
         <div class="container">
-          <h1 class="display-3">Hello, user!</h1>
+          <h1 class="display-3">Hello, <?= $username ?>!</h1>
           <p>It's nice to see you again!</p>
         </div>
       </div>
