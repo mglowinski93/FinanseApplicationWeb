@@ -27,6 +27,10 @@ if (!isset($_SESSION['logged_id']))
 		}
 	}
 }
+else
+{
+	header('Location: index.php');
+}
 ?>
 
 <!DOCTYPE html>
