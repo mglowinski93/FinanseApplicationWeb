@@ -37,7 +37,6 @@ if (isset($_SESSION['logged_id']))
 	$payment_category_query->bindValue(':user_id', $_SESSION['logged_id'], PDO::PARAM_STR);
 	$payment_category_query->execute();
     $payment_categories = $payment_category_query->fetchAll();
-
 }
 else
 {
@@ -191,11 +190,16 @@ else
                 <label for="paymentTypeSelect" class="col-sm-2 col-form-label">Payment type</label>
                 <div class="col-sm-10">
                   <select class="form-control" name="paymentType" id="paymentTypeSelect">
-					<?php
+					<?php				
 						foreach ($payment_categories as $payment_category)
 						{
+						  $selected = '';
+						  if($payment_category["name"] == "Debit Card")
+						  {
+							$selected = 'selected ';
+						  }
 						  echo'
-							   <option value="'.$payment_category["id"].'">'.$payment_category["name"].'</option>
+							   <option '.$selected.'value="'.$payment_category["id"].'">'.$payment_category["name"].'</option>
 						      ';
 						}
 					?>
@@ -210,9 +214,14 @@ else
                     <?php
 						foreach ($expense_categories as $expense_category)
 						{
+						  $checked = '';
+						  if($expense_category["name"] == "Food")
+						  {
+							  $checked = 'checked ';
+						  }
 						  echo'
 						  <div class="form-check">
-							<input required class="form-check-input" type="radio" name="expenseCategory" id="'.$expense_category["name"].'" value='.$expense_category["id"].'>
+							<input required '.$checked.'class="form-check-input" type="radio" name="expenseCategory" id="'.$expense_category["name"].'" value='.$expense_category["id"].'>
 							<label class="form-check-label" for="'.$expense_category["name"].'">
 							  '.$expense_category["name"].'
 							</label>

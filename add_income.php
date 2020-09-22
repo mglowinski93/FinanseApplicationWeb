@@ -184,9 +184,14 @@ else
 					  <?php
 						foreach ($income_categories as $income_category)
 						{
+						  $checked = '';
+						  if($income_category["name"] == "Salary")
+						  {
+							  $checked = 'checked ';
+						  }
 						  echo'
 						  <div class="form-check">
-							<input required class="form-check-input" type="radio" name="incomeCategory" id="'.$income_category["name"].'" value='.$income_category["id"].'>
+							<input required '.$checked.'class="form-check-input" type="radio" name="incomeCategory" id="'.$income_category["name"].'" value='.$income_category["id"].'>
 							<label class="form-check-label" for="'.$income_category["name"].'">
 							  '.$income_category["name"].'
 							</label>
