@@ -7,8 +7,8 @@ if (isset($_SESSION['logged_id']))
 	require_once 'database.php';
 	if(isset($_GET['startDate']) && isset($_GET['endDate']))
 	{	
-		$start_date = $_GET['startDate'];
-		$end_date = $_GET['endDate'];
+		$start_date = htmlentities(filter_input(INPUT_GET, 'startDate'));
+		$end_date = htmlentities(filter_input(INPUT_GET, 'endDate'));
 		$user_id = $_SESSION['logged_id'];
 		
 		$expenses_query = "SELECT expenses_category_assigned_to_users.name, SUM(expenses.amount) FROM expenses INNER JOIN expenses_category_assigned_to_users ON expenses.expense_category_assigned_to_user_id=expenses_category_assigned_to_users.id WHERE expenses.date_of_expense BETWEEN :start_date AND :end_date AND expenses.user_id = :user_id GROUP BY expenses.expense_category_assigned_to_user_id";
@@ -62,8 +62,12 @@ if (isset($_SESSION['logged_id']))
 		{
 			$summary = $stmt_summary->fetch();
 			$balance = $summary[0];
-		}
-		
+		}		
+	}
+	else
+	{
+		echo '<span style="color:red;">Please do not touch get parameters!</span>';
+		exit();
 	}
 }
 else
