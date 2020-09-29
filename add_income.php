@@ -170,7 +170,7 @@ else
                 <div class="form-group row">
                   <label for="incomeValue" class="col-sm-2 col-form-label">Value</label>
                   <div class="col-sm-10">
-                    <input type="number" class="form-control" id="incomeValue" name="income_value" placeholder="100" required>
+                    <input type="number" step="0.01" class="form-control" id="incomeValue" name="income_value" placeholder="100" required>
                   </div>
                 </div>
                 <div class="form-group row">

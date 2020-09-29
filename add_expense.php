@@ -177,7 +177,7 @@ else
               <div class="form-group row">
                 <label for="expenseValue" class="col-sm-2 col-form-label">Value</label>
                 <div class="col-sm-10">
-                  <input type="number" class="form-control" id="expenseValue" name="expense_value" placeholder="100" required>
+                  <input type="number" step="0.01" class="form-control" id="expenseValue" name="expense_value" placeholder="100" required>
                 </div>
               </div>
 
