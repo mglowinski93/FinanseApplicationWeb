@@ -44,7 +44,7 @@ if (isset($_SESSION['logged_id']))
 		}
 		
 		
-		$summary_query = "SELECT (SELECT SUM(amount) FROM incomes WHERE user_id = :income_user_id and date_of_income BETWEEN :income_start_date and :income_end_date) - (SELECT SUM(amount) FROM expenses WHERE user_id = :expense_user_id and date_of_expense BETWEEN :expense_start_date and :expense_end_date)";
+		$summary_query = "SELECT IFNULL(TotalIncomes ,0) - IFNULL(TotalExpenses,0) AS balance FROM (SELECT (SELECT SUM(amount) FROM incomes WHERE user_id = :income_user_id and date_of_income and date_of_income BETWEEN :income_start_date and :income_end_date) AS TotalIncomes, (SELECT SUM(amount) FROM expenses WHERE user_id = :expense_user_id and date_of_expense BETWEEN :expense_start_date and :expense_end_date) AS TotalExpenses) temp";
 		$stmt_summary= $db->prepare($summary_query);
 		$stmt_summary->bindParam(':income_start_date', $start_date);
 		$stmt_summary->bindParam(':income_end_date', $end_date);
