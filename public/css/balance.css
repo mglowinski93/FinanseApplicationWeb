@@ -1,0 +1,33 @@
+#incomeSummary
+{
+    text-align: center;
+    border: 1px solid rebeccapurple;
+    border-radius: 5px;
+}
+
+#expenseSummary
+{
+    text-align: center;
+    border: 1px solid rebeccapurple;
+    border-radius: 5px;
+}
+
+#balanceSummary
+{
+    margin-top: 10px;
+    text-align: center;
+    border: 1px solid rebeccapurple;
+    border-radius: 5px;
+}
+
+#piechartSummary
+{
+    margin-top: 10px;
+    text-align: center;
+    min-height: 600px;
+}
+
+.charts
+{
+    min-width: 450px;
+}

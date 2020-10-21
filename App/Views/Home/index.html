@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block body %}
+      <div class="jumbotron jumbotron-fluid" style="background-color: ghostwhite;">
+        <div class="container">
+		{% if current_user %}
+          <h1 class="display-3">Hello, {{current_user.name}}</h1>
+          <p>It&#39;s nice to see you again!</p>
+		{% else %}
+			<h1 class="display-3">Hello, stranger!</h1>
+            <p>Please, <a href ="/login">login</a>  or <a href ="/signup/new">register</a> to get full access</p>
+		{% endif %}
+        </div>
+      </div>
+
+      <div class="container" id="headerPicture">
+        <div class="row">
+          <div class="col">
+            <img class="image-fluid" src="img/header.jpg" alt="" />
+          </div>
+        </div>
+      </div>
+
+      <div class="container" id="financeArticles">
+        <div class="row">
+          <div class="col-md-4 border-right">
+            <h2>Saving for retirement</h2>
+            <p>Most popular retirement saving plan are IKE and IKZE. Below article will help you to understand which one is more suitable for you.</p>
+            <p><a class="btn btn-secondary" href="https://blog.opiekuninwestora.pl/ike-ikze/" target="_blank" role="button">See more &raquo;</a></p>
+          </div>
+          <div class="col-md-4 border-right">
+            <h2>10 tips to save money</h2>
+            <p>Did you ever wondered how to save money? Here are 10 easy to follow steps which should help you to learn basic habits of wiser spending money.</p>
+            <p><a class="btn btn-secondary" href="https://www.totalmoney.pl/artykuly/528152,konta-oszczednosciowe,10-zasad-oszczedzania---skad-wytrzasnac-dodatkowe-pieniadze,1,1" target="_blank" role="button">See more &raquo;</a></p>
+          </div>
+          <div class="col-md-4">
+            <h2>Do saving coins with a small denomination matters?</h2>
+            <p>Currently we are buying for small amount of money. Are you aware how saving small amount of money can give you a extravagant holiday?</p>
+            <p><a class="btn btn-secondary" href="https://aleksandraruta.pl/blog/dlaczego-kazde-5-zl-ma-takie-znaczenie/" target="_blank" role="button">See more &raquo;</a></p>
+          </div>
+        </div>
+
+        <hr>
+      </div>
+
+{% endblock %}

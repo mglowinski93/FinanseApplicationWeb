@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block head %}
+	<link href="/css/user_form.css" rel="stylesheet">
+{% endblock %}
+
+{% block title %}Add Income{% endblock %}
+
+{% block body %}
+	<div class="container text-center">
+		<div class="row">
+			<div class="col">
+				<form class="form-user-credentials" action="/income/save" method="post">
+				
+					<h1 class="h3 mb-3 font-weight-normal">Add income</h1>
+					
+<div class="form-group row">
+                  <label for="incomeValue" class="col-sm-2 col-form-label">Value</label>
+                  <div class="col-sm-10">
+                    <input type="number" step="0.01" class="form-control" id="incomeValue" name="income_value" placeholder="100" required>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="incomeComment" class="col-sm-2 col-form-label">Comment</label>
+                  <div class="col-sm-10">
+                    <textarea class="form-control" id="incomeComment" name="income_comment" placeholder="" rows="3"></textarea>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="incomeDate" class="col-sm-2 col-form-label">Date</label>
+                  <div class="col-sm-5">
+                    <input type="date" class="form-control" id="incomeDate" name="income_date" required>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-6 text-left">
+                    <button type="reset" class="btn btn-danger btn-sm">Cancel</button>
+                  </div>
+                  <div class="col-6 text-right">
+                    <button type="submit" class="btn btn-success btn-sm">Add income</button>
+                  </div>
+                </div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}

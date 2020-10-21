@@ -1,0 +1,28 @@
+{% extends "user_form_base.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block user_form %}
+	<form class="form-user-credentials" action="/login/create" method="post">
+	
+		<img class="mb-4" src="/img/logo.png" alt="" width="72" height="72" />
+		<h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+		
+		<div class="form-group">
+			<input type="email" id="inputEmail" name="email" placeholder="Email address" autofocus value="{{ email }}" class="form-control" />
+		</div>
+		<div class="form-group">
+			<input type="password" id="inputPassword" name="password" placeholder="Password" class="form-control" />
+		</div>
+		<div class="checkbox">
+			<label>
+				<input type="checkbox" name="remember_me" {% if remember_me %} checked="checked"{% endif %} /> Remember me
+			</label>
+		</div>
+
+		<button type="submit" class="btn btn-lg btn-primary btn-block">Log in</button>
+		<a href="/password/forgot">Forgot password?</a>
+		<br>
+		<a href="/signup/new">Don't have an account?</a>
+	</form>
+{% endblock %}

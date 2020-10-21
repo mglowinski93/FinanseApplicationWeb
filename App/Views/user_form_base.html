@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block head %}
+	<link href="/css/user_form.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+	{% block pre_user_form %}
+
+	{% endblock %}
+	
+	<div class="container text-center">
+		<div class="row">
+			<div class="col">
+				{% block user_form %}
+				
+				{% endblock %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

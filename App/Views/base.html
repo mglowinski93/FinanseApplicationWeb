@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Tab icon -->
+    <link rel="icon" href="img/logo.png">
+
+    <!-- Custom CSS -->
+    <link href="/css/main.css" rel="stylesheet">
+    <link href="/css/modal.css" rel="stylesheet">
+    <link href="/css/fontello.css" rel="stylesheet">
+	
+	{% block head %}{% endblock %}
+
+
+    <script type="text/javascript" src="js/main.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+	
+	
+	<title>Finance App {% block title %}{% endblock %}</title>
+</head>
+<body onload="setBalanceStartingDate(); setBalanceEndingDate();">
+	<header>
+	  <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+		<a class="navbar-brand" href="index.php">
+		  <img src="/img/logo.png" width="30" height="30" alt="">
+		</a>
+		<a class="navbar-brand" href="/">Finance App</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+		  <span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="mainNavbar">
+		  <ul class="navbar-nav mr-auto">
+			<li class="nav-item">
+			  <a class="nav-link" href="/"><i class="icon-home"></i>  Home<span class="sr-only">(current)</span></a>
+			</li>
+			{% if current_user %}
+				<li class="nav-item">
+				  <a class="nav-link" href="add_income.php"><i class="icon-dollar"></i>Add income</a>
+				</li>
+				<li class="nav-item">
+				  <a class="nav-link" href="add_expense.php"><i class="icon-basket"></i>  Add expense</a>
+				</li>
+				<li class="nav-item dropdown">
+				  <a class="nav-link dropdown-toggle" id="balanceDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-chart-bar"></i>  View balance</a>
+				  <div class="dropdown-menu" aria-labelledby="balanceDropdown">
+					<a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-01')."&endDate=".date("Y-m-t")?>">Current month</a>
+					<a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-d', mktime(0, 0, 0, date('m')-1, 1))."&endDate=".date('Y-m-d', mktime(0, 0, 0, date('m'), 0))?>">Last month</a>
+					<a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-01-01')."&endDate=".date('Y-12-31')?>">Current Year</a>
+					<a class="dropdown-item" href="#userDefinedBalanceDatesModal" data-toggle="modal" data-target="#userDefinedBalanceDatesModal">User definer period</a>
+				  </div>
+				</li>
+
+				<li class="nav-item">
+				  <a class="nav-link" href="/profile/show"><i class="icon-wrench"></i>  Settings</a>
+				</li>
+				<li class="nav-item">
+				  <a class="nav-link" href="/logout"><i class="icon-logout"></i>  Logout</a>
+				</li>
+			{% endif %}
+		  </ul>
+		</div>
+	  </nav>
+	  
+	{% if current_user %}
+	  <!-- Modal -->
+	  <div class="modal fade" id="userDefinedBalanceDatesModal" role="dialog">
+		<div class="modal-dialog">
+
+		  <!-- Modal content-->
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h4 class="col-12 modal-title">Chose dates to display balance</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-income" action="./balance.php" method="get">
+					<div class="form-group row">
+					  <label for="balanceStartingDate" class="col-sm-3 col-form-label">Start date</label>
+					  <div class="col-sm-8">
+						<input type="date" class="form-control" id="balanceStartingDate" name="startDate" required>
+					  </div>
+					</div>
+					<div class="form-group row">
+					  <label for="balanceEndingDate" class="col-sm-3 col-form-label">End Date</label>
+					  <div class="col-sm-8">
+						<input type="date" class="form-control" id="balanceEndingDate" name="endDate" required>
+					  </div>
+					</div>
+					<div class="form-group row">
+					  <div class="col-6 text-left">
+						<button type="submit" class="btn btn-danger btn-sm btn-block" data-dismiss="modal">Cancel</button>
+					  </div>
+					  <div class="col-6 text-right">
+						<button type="submit" class="btn btn-success btn-sm btn-block">Show balance</button>
+					  </div>
+					</div>
+				</form>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	{% endif %}
+	</header>
+
+	{% for message in flash_messages %}
+		<div class="alert alert-{{ message.type }} flashMessage alert-dismissible fade show" role="alert">
+			{{ message.body }}
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+	{% endfor %}
+	
+	{% block body %}
+	{% endblock %}
+
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+	
+    {% block footer %}
+		<footer class="container text-center">
+			<p class="mt-5 mb-3 text-muted">&copy;Finance App 2020</p>
+		</footer>
+    {% endblock %}
+
+</body>
+</html>
