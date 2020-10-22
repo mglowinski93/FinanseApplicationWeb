@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use \Core\View;
+use \App\Auth;
+use \App\Flash;
 
 /**
  * Items controller (example)
@@ -12,34 +14,41 @@ use \Core\View;
 //class Income extends \Core\Controller
 class Income extends Authenticated
 {
+	
+	/**
+     * Before filter - called before each action method
+     *
+     * @return void
+     */
+	 protected function before()
+    {
+        parent::before();
+
+        $this->user = Auth::getUser();
+    }
 
     /**
      * Items index
      *
      * @return void
      */
-    public function indexAction()
-    {
-        View::renderTemplate('Incomes/new.html');
-    }
-
-    /**
-     * Add a new item
-     *
-     * @return void
-     */
     public function newAction()
     {
-        echo "new action";
+		
+        View::renderTemplate('Incomes/new.html', [
+			'income_categories' => $this->user->getIncomeCategories()
+		]);
     }
 
     /**
-     * Show an item
+     * Save income in database
      *
      * @return void
      */
-    public function showAction()
+    public function saveAction()
     {
-        echo "show action";
-    }
+        $this->user->saveIncome($_POST);
+		Flash::addMessage('Income successfully saved');
+		$this->redirect('/income/new');
+	}
 }

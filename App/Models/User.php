@@ -67,7 +67,7 @@ class User extends \Core\Model
 
             if ($stmt->execute())
 			{
-				return $this->prepare_default_categories();
+				return $this->prepareDefaultCategories();
 			}
 			else
 			{
@@ -455,11 +455,50 @@ class User extends \Core\Model
     }
 	
 	/**
+     *	Save income to database
+     *
+     * @return boolean, True when save was successful, otherwise false
+     */
+    public function saveIncome($data)
+    {
+		$db = static::getDB();
+		
+		$sql = "INSERT INTO incomes (id, user_id, income_category_assigned_to_user_id, amount, date_of_income, income_comment) VALUES (NULL, :user_id, :income_category_assigned_to_user_id, :amount, :date_of_income, :income_comment)";
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		$stmt->bindValue(':income_category_assigned_to_user_id', $data['incomeCategory'], PDO::PARAM_STR);
+		$stmt->bindValue(':amount', $data['incomeValue'], PDO::PARAM_INT);
+		$stmt->bindValue(':date_of_income', $data['incomeDate'], PDO::PARAM_STR);
+		$stmt->bindValue(':income_comment', $data['incomeComment'], PDO::PARAM_INT);
+		
+		return $stmt->execute();
+    }
+	
+	/**
+     *	Get incomes categories assigned to user
+     *
+     * @return array of incomes category
+     */
+    public function getIncomeCategories()
+    {
+		$db = static::getDB();
+		$user = $this->findByEmail($this->email);
+		
+		$income_category_sql = $db->prepare('SELECT id, name FROM incomes_category_assigned_to_users WHERE user_id = :user_id');
+		$income_category_sql->bindValue(':user_id', $user->id, PDO::PARAM_STR);
+		$income_category_sql->execute();
+		return $income_category_sql->fetchAll();
+    }
+	
+	
+	
+	/**
      * Copy default categories for incomes, expenses, payments
      *
      * @return @return boolean True if the data was updated, false otherwise
      */
-    private function prepare_default_categories()
+    private function prepareDefaultCategories()
     {
 		$db = static::getDB();
 		$user = $this->findByEmail($this->email);
