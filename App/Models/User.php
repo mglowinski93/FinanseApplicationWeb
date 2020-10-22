@@ -58,13 +58,21 @@ class User extends \Core\Model
 
             $db = static::getDB();
             $stmt = $db->prepare($sql);
+			
 
             $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
             $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
             $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
             $stmt->bindValue(':activation_hash', $hashed_token, PDO::PARAM_STR);
 
-            return $stmt->execute();
+            if ($stmt->execute())
+			{
+				return $this->prepare_default_categories();
+			}
+			else
+			{
+				return false;
+			}
         }
 
         return false;
@@ -444,5 +452,30 @@ class User extends \Core\Model
         }
 
         return false;
+    }
+	
+	/**
+     * Copy default categories for incomes, expenses, payments
+     *
+     * @return @return boolean True if the data was updated, false otherwise
+     */
+    private function prepare_default_categories()
+    {
+		$db = static::getDB();
+		$user = $this->findByEmail($this->email);
+		
+		$copy_expenses_category_sql = $db->prepare("INSERT INTO incomes_category_assigned_to_users (id, user_id, name) SELECT NULL, :user_id, name FROM incomes_category_default");
+		$copy_expenses_category_sql->bindValue(':user_id', $user->id, PDO::PARAM_STR);
+		if(!$copy_expenses_category_sql->execute()){return false;}
+		
+		$copy_incomes_category_sql = $db->prepare("INSERT INTO expenses_category_assigned_to_users (id, user_id, name) SELECT NULL, :user_id, name FROM expenses_category_default");
+		$copy_incomes_category_sql->bindValue(':user_id', $user->id, PDO::PARAM_STR);
+		if(!$copy_incomes_category_sql->execute()){return false;}
+		
+		$copy_payment_methods_sql = $db->prepare("INSERT INTO payment_methods_assigned_to_users (id, user_id, name)  SELECT NULL, :user_id, name FROM payment_methods_default");
+		$copy_payment_methods_sql->bindValue(':user_id', $user->id, PDO::PARAM_STR);
+		if(!$copy_payment_methods_sql->execute()){return false;}
+		
+		return true;
     }
 }
