@@ -549,6 +549,68 @@ class User extends \Core\Model
     }
 	
 	/**
+     *	Get expenses assigned to user
+     *
+     * @return array of expenses
+     */
+    public function getExpenses($startDate, $endDate)
+    {
+		$db = static::getDB();
+		
+		$sql = "SELECT expenses_category_assigned_to_users.name, SUM(expenses.amount) FROM expenses INNER JOIN expenses_category_assigned_to_users ON expenses.expense_category_assigned_to_user_id=expenses_category_assigned_to_users.id WHERE expenses.date_of_expense BETWEEN :startDate AND :endDate AND expenses.user_id = :user_id GROUP BY expenses.expense_category_assigned_to_user_id";
+		
+		$stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		$stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+		$stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+		
+		$stmt->execute();
+		return $stmt->fetchAll();
+    }
+	
+	/**
+     *	Get incomes assigned to user
+     *
+     * @return array of incomes
+     */
+    public function getIncomes($startDate, $endDate)
+    {
+		$db = static::getDB();
+		
+		$sql = "SELECT incomes_category_assigned_to_users.name, SUM(incomes.amount) FROM incomes INNER JOIN incomes_category_assigned_to_users ON incomes.income_category_assigned_to_user_id=incomes_category_assigned_to_users.id WHERE incomes.date_of_income BETWEEN :startDate AND :endDate AND incomes.user_id = :user_id GROUP BY incomes.income_category_assigned_to_user_id";
+		
+		$stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		$stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+		$stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+		
+		$stmt->execute();
+		return $stmt->fetchAll();
+    }
+	
+	/**
+     *	Get summary for particular period
+     *
+     * @return number result from defined period
+     */
+    public function getBalance($startDate, $endDate)
+    {
+		$db = static::getDB();
+		
+		$sql = "SELECT IFNULL(TotalIncomes ,0) - IFNULL(TotalExpenses,0) AS balance FROM (SELECT (SELECT SUM(amount) FROM incomes WHERE user_id = :income_user_id and date_of_income and date_of_income BETWEEN :income_startDate and :income_endDate) AS TotalIncomes, (SELECT SUM(amount) FROM expenses WHERE user_id = :expense_user_id and date_of_expense BETWEEN :expense_startDate and :expense_endDate) AS TotalExpenses) temp";
+		$stmt= $db->prepare($sql);
+		$stmt->bindParam(':income_startDate', $startDate);
+		$stmt->bindParam(':income_endDate', $endDate);
+		$stmt->bindParam(':income_user_id', $this->id);
+		$stmt->bindParam(':expense_startDate', $startDate);
+		$stmt->bindParam(':expense_endDate', $endDate);
+		$stmt->bindParam(':expense_user_id', $this->id);
+		
+		$stmt->execute();
+		return $stmt->fetch()[0];
+    }
+	
+	/**
      * Copy default categories for incomes, expenses, payments
      *
      * @return @return boolean True if the data was updated, false otherwise

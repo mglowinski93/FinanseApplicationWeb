@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Balance{% endblock %}
+
+
+{% block head %}
+	<link href="/css/balance.css" rel="stylesheet">
+	
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    
+	<script type="text/javascript">
+		google.charts.load("current", {packages:["corechart"]});
+		google.charts.setOnLoadCallback(drawChart);
+		function drawChart() {
+			var data = google.visualization.arrayToDataTable([
+			  ['Expenses', 'Amount (in PLN)'],
+					{% for expense in expenses %}
+						['{{ expense.name }}', {{ expense[1] }}],
+					{% endfor %}
+			]);
+
+		  var options = {
+			pieSliceText: 'label',
+			title: 'Your expenses',
+			pieStartAngle: 100,
+			backgroundColor: 'smokewhite',
+			titleTextStyle: {
+				color: 'black'
+			},
+			hAxis: {
+				textStyle: {
+					color: 'black'
+				},
+				titleTextStyle: {
+					color: 'black'
+				}
+			},
+			vAxis: {
+				textStyle: {
+					color: 'black'
+				},
+				titleTextStyle: {
+					color: 'black'
+				}
+			},
+			legend: {
+				textStyle: {
+					color: 'black'
+				}
+			}
+		  };
+
+			var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+			chart.draw(data, options);
+			window.addEventListener('resize', drawChart, false);
+		}
+
+	</script>
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<div class="py-5 text-center">
+			<h2>Balance</h2>
+			<p class="lead">{{ title }}</p>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-6" id="incomeSummary">
+				<p class="lead">Incomes</p>
+				<table class="table table-striped">
+					<tbody>
+						{% for income in incomes %}
+							<tr>
+								<td>{{ income.name }}</td>
+								<td>{{ income[1] }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<div class="col-sm-6" id="expenseSummary">
+				<p class="lead">Expenses</p>
+				<table class="table table-striped">
+					<tbody>
+						{% for expense in expenses %}
+							<tr>
+								<td>{{ expense.name }}</td>
+								<td>{{ expense[1] }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="row" id="balanceSummary">
+			<div class="col">
+				<p class="lead">Summary</p>
+				<p style="">Balance: {{ balance }} PLN</p>
+				{% if balance >= 0  %}
+					<p style="color: green">Great! You manage your finances well</p>
+				{% else %}
+					<p style="color: red">Too bad! You must think about reducing expenses</p>
+				{% endif %}
+			</div>
+		</div>
+		<div class="row charts" id="piechartSummary">
+			<div class="col-sm-12" id="piechart"></div>
+		</div>
+	</div>
+{% endblock %}
