@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Config;
 use \Core\View;
 use \App\Auth;
 use \App\Flash;
@@ -36,7 +37,9 @@ class Expense extends Authenticated
     {
         View::renderTemplate('Expenses/new.html', [
 			'expense_categories' => $this->user->getExpenseCategories(),
-			'payment_types' => $this->user->getPaymentTypes()
+			'payment_types' => $this->user->getPaymentTypes(),
+			'default_expense_category' => Config::DEFAULT_EXPENSE_CATEGORY,
+			'default_payment_category' => Config::DEFAULT_PAYMENT_CATEGORY
 		]);
     }
 

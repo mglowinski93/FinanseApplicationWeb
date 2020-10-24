@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Config;
 use \Core\View;
 use \App\Auth;
 use \App\Flash;
@@ -36,7 +37,8 @@ class Income extends Authenticated
     {
 		
         View::renderTemplate('Incomes/new.html', [
-			'income_categories' => $this->user->getIncomeCategories()
+			'income_categories' => $this->user->getIncomeCategories(),
+			'default_income_category' => Config::DEFAULT_INCOME_CATEGORY
 		]);
     }
 
