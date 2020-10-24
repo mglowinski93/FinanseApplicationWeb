@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Tab icon -->
-    <link rel="icon" href="img/logo.png">
+    <link rel="icon" href="/img/logo.png">
 
     <!-- Custom CSS -->
     <link href="/css/main.css" rel="stylesheet">
@@ -50,9 +50,9 @@
 				<li class="nav-item dropdown">
 				  <a class="nav-link dropdown-toggle" id="balanceDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-chart-bar"></i>  View balance</a>
 				  <div class="dropdown-menu" aria-labelledby="balanceDropdown">
-					<a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-01')."&endDate=".date("Y-m-t")?>">Current month</a>
-					<a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-m-d', mktime(0, 0, 0, date('m')-1, 1))."&endDate=".date('Y-m-d', mktime(0, 0, 0, date('m'), 0))?>">Last month</a>
-					<a class="dropdown-item" href="<?="balance.php?startDate=".date('Y-01-01')."&endDate=".date('Y-12-31')?>">Current Year</a>
+					<a class="dropdown-item" href="/balance/showBalanceFromCurrentMonth">Current month</a>
+					<a class="dropdown-item" href="/balance/showBalanceFromLastMonth">Last month</a>
+					<a class="dropdown-item" href="/balance/showBalanceFromCurrentYear">Current Year</a>
 					<a class="dropdown-item" href="#userDefinedBalanceDatesModal" data-toggle="modal" data-target="#userDefinedBalanceDatesModal">User definer period</a>
 				  </div>
 				</li>
@@ -79,7 +79,7 @@
 			  <h4 class="col-12 modal-title">Chose dates to display balance</h4>
 			</div>
 			<div class="modal-body">
-				<form class="form-income" action="./balance.php" method="get">
+				<form class="form-income" action="/balance/showBalanceFromUserDefinedPeriod" method="post">
 					<div class="form-group row">
 					  <label for="balanceStartingDate" class="col-sm-3 col-form-label">Start date</label>
 					  <div class="col-sm-8">
