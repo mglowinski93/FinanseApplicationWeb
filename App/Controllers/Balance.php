@@ -67,7 +67,7 @@ class Balance extends Authenticated
 		unset($_POST['endDate']);
 		$title = 'Balance from '.$startDate.' to '.$endDate;
 		
-        $this->renderBalanceView($startDate, $endDate, $message);
+        $this->renderBalanceView($startDate, $endDate, $title);
     }
 	
 	private function renderBalanceView($startDate, $endDate, $title)
