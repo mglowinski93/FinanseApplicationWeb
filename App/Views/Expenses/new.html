@@ -30,7 +30,7 @@
 			<div class="col-sm-10">
 				<select class="form-control" name="paymentType" id="paymentTypeSelect">
 					{% for payment_type in payment_types %}
-						<option value="{{ payment_type.id }}">{{ payment_type.name }}</option>
+						<option {% if payment_type.name == default_payment_category %}selected {% endif %}value="{{ payment_type.id }}">{{ payment_type.name }}</option>
 					{% endfor %}
 				</select>
 			</div>
@@ -41,7 +41,7 @@
 			<div class="col-sm-10">
 				{% for expense_category in expense_categories %}
 					<div class="form-check">
-						<input required class="form-check-input" type="radio" name="expenseCategory" id="{{ expense_category.name }}" value="{{ expense_category.id }}">
+						<input required {% if expense_category.name == default_expense_category %}checked {% endif %}class="form-check-input" type="radio" name="expenseCategory" id="{{ expense_category.name }}" value="{{ expense_category.id }}">
 						<label class="form-check-label" for="{{ expense_category.name }}">
 						  {{ expense_category.name }}
 						</label>
