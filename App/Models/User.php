@@ -67,7 +67,7 @@ class User extends \Core\Model
 
             if ($stmt->execute())
 			{
-				return $this->prepare_default_categories();
+				return $this->prepareDefaultCategories();
 			}
 			else
 			{
@@ -455,11 +455,105 @@ class User extends \Core\Model
     }
 	
 	/**
+     *	Save income to database
+     *
+     * @return boolean, True when save was successful, otherwise false
+     */
+    public function saveIncome($data)
+    {
+		$db = static::getDB();
+		
+		$sql = "INSERT INTO incomes (id, user_id, income_category_assigned_to_user_id, amount, date_of_income, income_comment) VALUES (NULL, :user_id, :income_category_assigned_to_user_id, :amount, :date_of_income, :income_comment)";
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		$stmt->bindValue(':income_category_assigned_to_user_id', $data['incomeCategory'], PDO::PARAM_STR);
+		$stmt->bindValue(':amount', $data['incomeValue'], PDO::PARAM_INT);
+		$stmt->bindValue(':date_of_income', $data['incomeDate'], PDO::PARAM_STR);
+		$stmt->bindValue(':income_comment', $data['incomeComment'], PDO::PARAM_INT);
+		
+		return $stmt->execute();
+    }
+	
+	/**
+     *	Save expense to database
+     *
+     * @return boolean, True when save was successful, otherwise false
+     */
+    public function saveExpense($data)
+    {
+		$db = static::getDB();
+		
+		$sql = "INSERT INTO expenses (id, user_id, expense_category_assigned_to_user_id, payment_method_assigned_to_user_id, amount, date_of_expense, expense_comment) VALUES (NULL, :user_id, :expense_category_assigned_to_user_id, :payment_method_assigned_to_user_id, :amount, :date_of_expense, :expense_comment)";
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		$stmt->bindValue(':expense_category_assigned_to_user_id', $data['expenseCategory'], PDO::PARAM_STR);
+		$stmt->bindValue(':payment_method_assigned_to_user_id', $data['paymentType'], PDO::PARAM_STR);
+		$stmt->bindValue(':amount', $data['expenseValue'], PDO::PARAM_INT);
+		$stmt->bindValue(':date_of_expense', $data['expenseDate'], PDO::PARAM_STR);
+		$stmt->bindValue(':expense_comment', $data['expenseComment'], PDO::PARAM_INT);
+		
+		return $stmt->execute();
+    }
+	
+	/**
+     *	Get incomes categories assigned to user
+     *
+     * @return array of income categories
+     */
+    public function getIncomeCategories()
+    {
+		$db = static::getDB();
+		$sql = 'SELECT id, name FROM incomes_category_assigned_to_users WHERE user_id = :user_id';
+		
+		$stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		
+		$stmt->execute();
+		return $stmt->fetchAll();
+    }
+	
+	/**
+     *	Get expenses categories assigned to user
+     *
+     * @return array of expense categories
+     */
+    public function getExpenseCategories()
+    {
+		$db = static::getDB();
+		$sql = 'SELECT id, name FROM expenses_category_assigned_to_users WHERE user_id = :user_id';
+		
+		$stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		
+		$stmt->execute();
+		return $stmt->fetchAll();
+    }
+	
+	/**
+     *	Get payment types assigned to user
+     *
+     * @return array of payments category
+     */
+    public function getPaymentTypes()
+    {
+		$db = static::getDB();
+		$sql = 'SELECT id, name FROM payment_methods_assigned_to_users WHERE user_id = :user_id';
+		
+		$stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		
+		$stmt->execute();
+		return $stmt->fetchAll();
+    }
+	
+	/**
      * Copy default categories for incomes, expenses, payments
      *
      * @return @return boolean True if the data was updated, false otherwise
      */
-    private function prepare_default_categories()
+    private function prepareDefaultCategories()
     {
 		$db = static::getDB();
 		$user = $this->findByEmail($this->email);

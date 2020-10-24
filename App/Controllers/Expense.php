@@ -12,7 +12,7 @@ use \App\Flash;
  * PHP version 7.0
  */
 //class Income extends \Core\Controller
-class Income extends Authenticated
+class Expense extends Authenticated
 {
 	
 	/**
@@ -34,9 +34,9 @@ class Income extends Authenticated
      */
     public function newAction()
     {
-		
-        View::renderTemplate('Incomes/new.html', [
-			'income_categories' => $this->user->getIncomeCategories()
+        View::renderTemplate('Expenses/new.html', [
+			'expense_categories' => $this->user->getExpenseCategories(),
+			'payment_types' => $this->user->getPaymentTypes()
 		]);
     }
 
@@ -47,8 +47,8 @@ class Income extends Authenticated
      */
     public function saveAction()
     {
-        $this->user->saveIncome($_POST);
-		Flash::addMessage('Income successfully saved');
-		$this->redirect('/income/new');
+        $this->user->saveExpense($_POST);
+		Flash::addMessage('Expense successfully saved');
+		$this->redirect('/expense/new');
 	}
 }
