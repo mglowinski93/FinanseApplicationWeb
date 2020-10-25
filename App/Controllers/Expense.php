@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Config;
+use \App\Config;
 use \Core\View;
 use \App\Auth;
 use \App\Flash;
