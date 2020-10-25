@@ -1,0 +1,17 @@
+{% extends 'user_form_base.html' %}
+
+{% block title %}Forgot Password{% endblock %}
+
+{% block user_form %}
+	<form class="form-user-credentials" method="post" action="/password/request-reset">
+		<img class="mb-4" src="/img/logo.png" alt="" width="72" height="72" />
+		<h1 class="h3 mb-3 font-weight-normal">Password reset</h1>
+		
+		<div class="form-group">
+			<input type="email" id="inputEmail" name="email" placeholder="Email address" autofocus required class="form-control" />
+		</div>
+
+		<button type="submit" class="btn btn-lg btn-primary btn-block">Send password reset</button>
+		<a href="/login">Do you remember your password?</a>
+	</form>
+{% endblock %}

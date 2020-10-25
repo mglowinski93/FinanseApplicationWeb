@@ -1,0 +1,37 @@
+body {
+  background-color: whitesmoke;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+nav
+{
+  background-color: rebeccapurple;
+}
+
+#headerPicture
+{
+  padding-top: 20px;
+  padding-bottom: 100px;
+}
+
+#financeArticles
+{
+  background-color: ghostwhite;
+}
+
+.informationMargin
+{
+	margin: 8% auto 0% auto;
+}
+
+.flashMessage
+{
+	margin: 2% auto 0% auto;
+}
+
+img
+{
+  max-width: 100%;
+  height: auto;
+}

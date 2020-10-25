@@ -1,0 +1,58 @@
+{% extends "money_form_base.html" %}
+
+{% block title %}Add Income{% endblock %}
+
+{% block load_javascript_functions %}setIncomeTodaysDateInCalendar();{% endblock %}
+
+{% block pre_money_form %}
+	<div class="py-5 text-center">
+		<h2>Add income</h2>
+		<p class="lead">Fill-in below form to add income</p>
+	</div>
+{% endblock %}
+
+{% block money_form %}
+	<form class="money-form" method="post" action="/income/save">
+		<div class="form-group row">
+			<label for="incomeValue" class="col-sm-2 col-form-label">Value</label>
+			<div class="col-sm-10">
+				<input type="number" step="0.01" class="form-control" id="incomeValue" name="incomeValue" placeholder="100" required>
+			</div>
+		</div>
+		<div class="form-group row">
+			<label for="incomeComment" class="col-sm-2 col-form-label">Comment</label>
+			<div class="col-sm-10">
+				<textarea class="form-control" id="incomeComment" name="incomeComment" placeholder="" rows="3"></textarea>
+			</div>
+		</div>
+		<fieldset class="form-group">
+			<div class="row">
+				<legend class="col-form-label col-sm-2 pt-0">Category</legend>
+				<div class="col-sm-10">
+					{% for income_category in income_categories %}
+						<div class="form-check">
+							<input required {% if income_category.name == default_income_category %}checked {% endif %}class="form-check-input" type="radio" name="incomeCategory" id="{{ income_category.name }}" value="{{ income_category.id }}">
+							<label class="form-check-label" for="{{ income_category.name }}">
+								{{ income_category.name }}
+							</label>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</fieldset>
+		<div class="form-group row">
+			<label for="incomeDate" class="col-sm-2 col-form-label">Date</label>
+			<div class="col-sm-5">
+				<input type="date" class="form-control" id="incomeDate" name="incomeDate" required>
+			</div>
+		</div>
+		<div class="form-group row">
+			<div class="col-6 text-left">
+				<button type="reset" class="btn btn-danger btn-sm">Cancel</button>
+			</div>
+			<div class="col-6 text-right">
+				<button type="submit" class="btn btn-success btn-sm">Add income</button>
+			</div>
+		</div>
+	</form>
+{% endblock %}
