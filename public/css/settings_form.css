@@ -1,0 +1,21 @@
+.settings-form {
+  width: 100%;
+  max-width: 500px;
+  padding: 15px;
+  margin: 0% auto 0% auto;
+  border-radius: 25px;
+  border: 1px solid whitesmoke;
+  background-color: whitesmoke;
+}
+
+.settings-form textarea {
+  resize: none !important;
+}
+
+.help-block {
+	font-size:80%;
+}
+
+#settings-display {
+  padding-bottom: 0px !important;
+}

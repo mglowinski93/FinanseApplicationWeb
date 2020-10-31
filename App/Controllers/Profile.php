@@ -43,9 +43,9 @@ class Profile extends Authenticated
      *
      * @return void
      */
-    public function editAction()
+    public function editProfileAction()
     {
-        View::renderTemplate('Profile/edit.html', [
+        View::renderTemplate('Profile/edit_profile.html', [
             'user' => $this->user
         ]);
     }

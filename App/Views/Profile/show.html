@@ -1,18 +1,61 @@
-{% extends "base.html" %}
+{% extends "settings_form_base.html" %}
 
 {% block title %}Profile{% endblock %}
 
-{% block body %}
-
-    <h1>Profile</h1>
-
-    <dl class="dl-horizontal">
-        <dt>Name</dt>
-        <dd>{{ user.name }}</dd>
-        <dt>email</dt>
-        <dd>{{ user.email }}</dd>
-    </dl>
-
-    <a href="/profile/edit">Edit</a>
-
+{% block body %}	
+	<div id="settings-display" class="py-5 text-center">
+		<div id="accordion">
+            <div class="card">
+                <div class="card-header" id="headingEditProfile">
+					<h5 class="mb-0">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#editProfile" aria-expanded="true" aria-controls="editProfile">
+						Profile Settings
+                    </button>
+                  </h5>
+                </div>
+                <div id="editProfile" class="collapse" aria-labelledby="headingEditProfile" data-parent="#accordion">
+					<div class="card-body">
+						<div class="py-5 text-center">
+							<h2>Profile settings</h2>
+							<dl>
+								<dt>Name</dt>
+								<dd>{{ user.name }}</dd>
+								<dt>Email</dt>
+								<dd>{{ user.email }}</dd>
+							</dl>
+							<button class="btn btn-primary" onclick="location.href='/profile/editProfile'" type="button">Edit profile</button>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-header" id="headingEditIncomes">
+						<h5 class="mb-0">
+							<button class="btn btn-link collapsed" data-toggle="collapse" data-target="#editIncomes" aria-expanded="false" aria-controls="editIncomes">
+								Incomes Settings
+							</button>
+						</h5>
+					</div>
+					<div id="editIncomes" class="collapse" aria-labelledby="headingEditIncomes" data-parent="#accordion">
+						<div class="card-body" style="text-align: center;">
+							INCOMES INFO
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-header" id="headingEditExpenses">
+					<h5 class="mb-0">
+						<button class="btn btn-link collapsed" data-toggle="collapse" data-target="#editExpenses" aria-expanded="false" aria-controls="editExpenses">
+							Expenses Settings
+						</button>
+					</h5>
+					</div>
+					<div id="editExpenses" class="collapse" aria-labelledby="headingEditExpenses" data-parent="#accordion">
+						<div class="card-body">
+							EXPENSES INFO
+						</div>
+					</div>
+				</div>
+            </div>
+		</div>
+    </div>
 {% endblock %}
