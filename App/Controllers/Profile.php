@@ -34,7 +34,9 @@ class Profile extends Authenticated
     public function showAction()
     {
         View::renderTemplate('Profile/show.html', [
-            'user' => $this->user
+            'user' => $this->user,
+			'income_categories' => $this->user->getIncomeCategories(),
+			'expense_categories' => $this->user->getExpenseCategories()
         ]);
     }
 
@@ -49,7 +51,66 @@ class Profile extends Authenticated
             'user' => $this->user
         ]);
     }
+	
+	/**
+     * Show the form for editing the income category
+     *
+     * @return void
+     */
+    public function editIncomeCategoryAction()
+    {
+        View::renderTemplate('Profile/edit_income_category.html', [
+            'income' => $this->user->getIncomeCategoryById($_POST['incomeCategoryIdToEdit'])
+        ]);
+    }
+	
+	/**
+     * Update the income category
+     *
+     * @return void
+     */
+    public function incomeCategoryUpdateAction()
+    {
+        if ($this->user->updateIncomeCategory($_POST)) {
 
+            Flash::addMessage('Changes saved');
+
+        } else {
+			Flash::addMessage('Failed to save data', Flash::INFO);
+        }
+		$this->redirect('/profile/show');
+    }
+	
+	/**
+     * Show the form for editing the expense category
+     *
+     * @return void
+     */
+    public function editExpenseCategoryAction()
+    {
+        View::renderTemplate('Profile/edit_expense_category.html', [
+            'expense' => $this->user->getExpenseCategoryById($_POST['expenseCategoryIdToEdit'])
+        ]);
+    }
+	
+	/**
+     * Update the expense category
+     *
+     * @return void
+     */
+    public function expenseCategoryUpdateAction()
+    {
+        if ($this->user->updateExpenseCategory($_POST)) {
+			
+            Flash::addMessage('Changes saved');
+
+        } else {
+
+           Flash::addMessage('Failed to save data', Flash::INFO);
+        }
+		$this->redirect('/profile/show');
+    }
+	
     /**
      * Update the profile
      *

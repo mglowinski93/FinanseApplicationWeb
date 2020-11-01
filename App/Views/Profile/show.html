@@ -1,6 +1,6 @@
 {% extends "settings_form_base.html" %}
 
-{% block title %}Profile{% endblock %}
+{% block title %}Settings{% endblock %}
 
 {% block body %}	
 	<div id="settings-display" class="py-5 text-center">
@@ -37,7 +37,26 @@
 					</div>
 					<div id="editIncomes" class="collapse" aria-labelledby="headingEditIncomes" data-parent="#accordion">
 						<div class="card-body" style="text-align: center;">
-							INCOMES INFO
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th scope="col">Income category</th>
+										<th scope="col">Edit</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for income_category in income_categories %}
+										<tr>
+											<td>{{ income_category.name }}</td>
+											<td>
+												<form action="/profile/editIncomeCategory" method="post">
+													<button class="btn btn-primary" name="incomeCategoryIdToEdit" value="{{ income_category.id }}" type="submit">Edit</button>
+												</form>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
@@ -51,7 +70,30 @@
 					</div>
 					<div id="editExpenses" class="collapse" aria-labelledby="headingEditExpenses" data-parent="#accordion">
 						<div class="card-body">
-							EXPENSES INFO
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th scope="col">Expense category</th>
+										<th scope="col">Limit Enabled</th>
+										<th scope="col">Limit</th>
+										<th scope="col">Edit</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for expense_category in expense_categories %}
+										<tr>
+											<td>{{ expense_category.name }}</td>
+											<td>{% if expense_category.limit_enabled %}Enabled{% else %}Disabled{% endif %}</td>
+											<td>{{ expense_category.expense_category_limit }}</td>
+											<td>
+												<form action="/profile/editExpenseCategory" method="post">
+													<button class="btn btn-primary" name="expenseCategoryIdToEdit" value="{{ expense_category.id }}" type="submit">Edit</button>
+												</form>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>

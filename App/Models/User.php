@@ -468,9 +468,9 @@ class User extends \Core\Model
 		
 		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
 		$stmt->bindValue(':income_category_assigned_to_user_id', $data['incomeCategory'], PDO::PARAM_STR);
-		$stmt->bindValue(':amount', $data['incomeValue'], PDO::PARAM_INT);
+		$stmt->bindValue(':amount', $data['incomeValue'], PDO::PARAM_STR);
 		$stmt->bindValue(':date_of_income', $data['incomeDate'], PDO::PARAM_STR);
-		$stmt->bindValue(':income_comment', $data['incomeComment'], PDO::PARAM_INT);
+		$stmt->bindValue(':income_comment', $data['incomeComment'], PDO::PARAM_STR);
 		
 		return $stmt->execute();
     }
@@ -490,9 +490,9 @@ class User extends \Core\Model
 		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
 		$stmt->bindValue(':expense_category_assigned_to_user_id', $data['expenseCategory'], PDO::PARAM_STR);
 		$stmt->bindValue(':payment_method_assigned_to_user_id', $data['paymentType'], PDO::PARAM_STR);
-		$stmt->bindValue(':amount', $data['expenseValue'], PDO::PARAM_INT);
+		$stmt->bindValue(':amount', $data['expenseValue'], PDO::PARAM_STR);
 		$stmt->bindValue(':date_of_expense', $data['expenseDate'], PDO::PARAM_STR);
-		$stmt->bindValue(':expense_comment', $data['expenseComment'], PDO::PARAM_INT);
+		$stmt->bindValue(':expense_comment', $data['expenseComment'], PDO::PARAM_STR);
 		
 		return $stmt->execute();
     }
@@ -515,6 +515,135 @@ class User extends \Core\Model
     }
 	
 	/**
+     *	Get particular income category assigned to user
+     *
+     * @return array of income categories
+     */
+    public function getIncomeCategoryById($category_id)
+    {
+		$db = static::getDB();
+		$sql = 'SELECT id, name FROM incomes_category_assigned_to_users WHERE user_id = :user_id AND id = :category_id';
+		
+		$stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		$stmt->bindValue(':category_id', $category_id, PDO::PARAM_INT);
+		
+		$stmt->execute();
+		
+		return $stmt->fetch();
+    }
+	
+	/**
+     * Find a income category by name
+     *
+     * @param string $name income category name to search for
+     *
+     * @return income
+     */
+	public function getIncomeCategoryByName($name)
+    {
+        $sql = 'SELECT id, name FROM incomes_category_assigned_to_users WHERE user_id = :user_id AND name = :name';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+
+
+        $stmt->execute();
+
+        return $stmt->fetch();
+    }
+	
+	/**
+     * See if a income category record already exists with the specified name
+     *
+     * @param string $name income category name to search for
+     * @param string $ignore_id Return false anyway if the record found has this ID
+     *
+     * @return boolean  True if a record already exists with the specified income name, false otherwise
+     */
+    public function incomeCategoryNameExists($name, $ignore_id = null)
+    {
+        $income = $this->getIncomeCategoryByName($name);
+
+        if ($income) {
+            if ($income['id'] != $ignore_id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+	
+	/**
+     * Update the user's particular income category
+     *
+     * @param array $data Data from the edit income category form
+     *
+     * @return boolean  True if the data was updated, false otherwise
+     */
+    public function updateIncomeCategory($data)
+    {
+        $incomeCategoryNewName = $data['incomeCategoryNewName'];
+        $incomeCategoryIdToEdit = $data['incomeCategoryIdToEdit'];
+		$incomeInDatabase = $this->getIncomeCategoryById($incomeCategoryIdToEdit);
+
+		if($incomeInDatabase['name'] != $incomeCategoryNewName)
+		{
+			$sql = 'UPDATE incomes_category_assigned_to_users SET name = :name WHERE id = :id';
+			
+			$db = static::getDB();
+			$stmt = $db->prepare($sql);
+			
+			$stmt->bindValue(':name', $incomeCategoryNewName, PDO::PARAM_STR);
+			$stmt->bindValue(':id', $incomeCategoryIdToEdit, PDO::PARAM_INT);
+			
+			return $stmt->execute();
+		}
+		return true;
+    }
+	
+	/**
+     * Update the user's particular expense category
+     *
+     * @param array $data Data from the edit expense category form
+     *
+     * @return boolean  True if the data was updated, false otherwise
+     */
+    public function updateExpenseCategory($data)
+    {
+        $expenseCategoryNewName = $data['expenseCategoryNewName'];
+        $expenseCategoryIdToEdit = $data['expenseCategoryIdToEdit'];
+		if(isset($data['expenseCategoryLimitEnabled']))
+		{
+			$expneseCategoryLimitEnabled = true;
+		}
+		else
+		{
+			$expneseCategoryLimitEnabled = false;
+		}
+		$expenseCategoryNewLimit = $data['expenseCategoryNewLimit'];
+		$expenseInDatabase = $this->getExpenseCategoryById($expenseCategoryIdToEdit);
+
+		if($expenseInDatabase['name'] != $expenseCategoryNewName || $expenseInDatabase['limit_enabled'] != $expneseCategoryLimitEnabled || $expenseInDatabase['expense_category_limit'] != $expenseCategoryNewLimit)
+		{
+			$sql = 'UPDATE expenses_category_assigned_to_users SET name = :name, limit_enabled = :limit_enabled, expense_category_limit = :expense_category_limit WHERE id = :id';
+			
+			$db = static::getDB();
+			$stmt = $db->prepare($sql);
+			
+			$stmt->bindValue(':name', $expenseCategoryNewName, PDO::PARAM_STR);
+			$stmt->bindValue(':limit_enabled', $expneseCategoryLimitEnabled, PDO::PARAM_BOOL);
+			$stmt->bindValue(':expense_category_limit', $expenseCategoryNewLimit, PDO::PARAM_STR);
+			$stmt->bindValue(':id', $expenseCategoryIdToEdit, PDO::PARAM_INT);
+			
+			return $stmt->execute();
+		}
+		return true;
+    }
+	
+	/**
      *	Get expenses categories assigned to user
      *
      * @return array of expense categories
@@ -522,13 +651,74 @@ class User extends \Core\Model
     public function getExpenseCategories()
     {
 		$db = static::getDB();
-		$sql = 'SELECT id, name FROM expenses_category_assigned_to_users WHERE user_id = :user_id';
+		$sql = 'SELECT id, name, limit_enabled, expense_category_limit FROM expenses_category_assigned_to_users WHERE user_id = :user_id';
 		
 		$stmt = $db->prepare($sql);
 		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
 		
 		$stmt->execute();
 		return $stmt->fetchAll();
+    }
+	
+	/**
+     *	Get particular expense category assigned to user
+     *
+     * @return array of expense categories
+     */
+    public function getExpenseCategoryById($category_id)
+    {
+		$db = static::getDB();
+		$sql = 'SELECT id, name, limit_enabled, expense_category_limit FROM expenses_category_assigned_to_users WHERE user_id = :user_id AND id = :category_id';
+		
+		$stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		$stmt->bindValue(':category_id', $category_id, PDO::PARAM_INT);
+		
+		$stmt->execute();
+		return $stmt->fetch();
+    }
+	
+	/**
+     * Find a expense category by name
+     *
+     * @param string $name expense category name to search for
+     *
+     * @return expense
+     */
+	public function getExpenseCategoryByName($name)
+    {
+        $sql = 'SELECT id, name FROM expenses_category_assigned_to_users WHERE user_id = :user_id AND name = :name';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+
+
+        $stmt->execute();
+
+        return $stmt->fetch();
+    }
+	
+	/**
+     * See if a expense category record already exists with the specified name
+     *
+     * @param string $name expense category name to search for
+     * @param string $ignore_id Return false anyway if the record found has this ID
+     *
+     * @return boolean  True if a record already exists with the specified expense name, false otherwise
+     */
+    public function expenseCategoryNameExists($name, $ignore_id = null)
+    {
+        $expense = $this->getExpenseCategoryByName($name);
+
+        if ($expense) {
+            if ($expense['id'] != $ignore_id) {
+                return true;
+            }
+        }
+		
+        return false;
     }
 	
 	/**
@@ -620,13 +810,13 @@ class User extends \Core\Model
 		$db = static::getDB();
 		$user = $this->findByEmail($this->email);
 		
-		$copy_expenses_category_sql = $db->prepare("INSERT INTO incomes_category_assigned_to_users (id, user_id, name) SELECT NULL, :user_id, name FROM incomes_category_default");
-		$copy_expenses_category_sql->bindValue(':user_id', $user->id, PDO::PARAM_STR);
-		if(!$copy_expenses_category_sql->execute()){return false;}
-		
-		$copy_incomes_category_sql = $db->prepare("INSERT INTO expenses_category_assigned_to_users (id, user_id, name) SELECT NULL, :user_id, name FROM expenses_category_default");
+		$copy_incomes_category_sql = $db->prepare("INSERT INTO incomes_category_assigned_to_users (id, user_id, name) SELECT NULL, :user_id, name FROM incomes_category_default");
 		$copy_incomes_category_sql->bindValue(':user_id', $user->id, PDO::PARAM_STR);
 		if(!$copy_incomes_category_sql->execute()){return false;}
+		
+		$copy_expenses_category_sql = $db->prepare("INSERT INTO expenses_category_assigned_to_users (id, user_id, name, limit_enabled, expense_category_limit) SELECT NULL, :user_id, name, limit_enabled, expense_category_limit FROM expenses_category_default");
+		$copy_expenses_category_sql->bindValue(':user_id', $user->id, PDO::PARAM_STR);
+		if(!$copy_expenses_category_sql->execute()){return false;}
 		
 		$copy_payment_methods_sql = $db->prepare("INSERT INTO payment_methods_assigned_to_users (id, user_id, name)  SELECT NULL, :user_id, name FROM payment_methods_default");
 		$copy_payment_methods_sql->bindValue(':user_id', $user->id, PDO::PARAM_STR);

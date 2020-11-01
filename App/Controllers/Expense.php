@@ -54,4 +54,18 @@ class Expense extends Authenticated
 		Flash::addMessage('Expense successfully saved');
 		$this->redirect('/expense/new');
 	}
+	
+	/**
+     * Validate if expense category is available (AJAX) for an user.
+     * The ID of an existing expense category can be passed in in the querystring to ignore in settings tab.
+     *
+     * @return void
+     */
+    public function validateCategoryAction()
+    {
+        $is_valid = ! $this->user->expenseCategoryNameExists($_GET['expenseCategoryNewName'], $_GET['ignore_id'] ?? null);
+
+        header('Content-Type: application/json');
+        echo json_encode($is_valid);
+    }
 }

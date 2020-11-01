@@ -1,0 +1,63 @@
+{% extends 'settings_form_base.html' %}
+
+{% block title %}Edit Income Category{% endblock %}
+
+{% block footer %}
+	{{ parent() }}
+	
+    <script>
+        $(document).ready(function() {
+
+            var categoryId = '{{ income.id }}';
+
+            /**
+             * Validate the form
+             */
+            $('#formIncomeCategoryEdit').validate({
+                rules: {
+                    incomeCategoryNewName: {
+                        required: true,
+                        remote: {
+                            url: '/income/validate-category',
+                            data: {
+                                ignore_id: function() {
+                                    return categoryId;
+                                }
+                            }
+                        }
+                    },
+                },
+                messages: {
+                    incomeCategoryNewName: {
+                        remote: 'There is already income category with such a name'
+                    }
+                }
+            });
+        });
+    </script>
+
+{% endblock %}
+
+{% block settings_form %}
+
+    <div class="py-5 text-center">
+		<h2>Edit income category</h2>
+	</div>
+
+    <form class="settings-form" method="post" id="formIncomeCategoryEdit" action="/profile/incomeCategoryUpdate">
+		<input type="hidden" id="incomeCategoryIdToEdit" name="incomeCategoryIdToEdit" value="{{ income.id }}">
+        <div class="form-group">
+            <label for="incomeCategoryNewName">Income category name</label>
+            <input id="incomeCategoryNewName" name="incomeCategoryNewName" placeholder="Income category name" value="{{ income.name }}" required class="form-control" />
+        </div>
+		<div class="form-group row">
+			<div class="col-6 text-left">
+				<button class="btn btn-danger btn-sm" onclick="location.href='/profile/show'" type="button">Cancel</button>
+			</div>
+			<div class="col-6 text-right">
+				<button type="submit" class="btn btn-success btn-sm">Save</button>
+			</div>
+		</div>
+    </form>
+
+{% endblock %}

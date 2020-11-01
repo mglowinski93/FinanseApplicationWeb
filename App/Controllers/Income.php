@@ -53,4 +53,18 @@ class Income extends Authenticated
 		Flash::addMessage('Income successfully saved');
 		$this->redirect('/income/new');
 	}
+	
+	 /**
+     * Validate if income category is available (AJAX) for an user.
+     * The ID of an existing income category can be passed in in the querystring to ignore in settings tab.
+     *
+     * @return void
+     */
+    public function validateCategoryAction()
+    {
+        $is_valid = ! $this->user->incomeCategoryNameExists($_GET['incomeCategoryNewName'], $_GET['ignore_id'] ?? null);
+
+        header('Content-Type: application/json');
+        echo json_encode($is_valid);
+    }
 }
