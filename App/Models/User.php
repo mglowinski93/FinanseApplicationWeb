@@ -759,6 +759,46 @@ class User extends \Core\Model
     }
 	
 	/**
+     *	Get sum of expences in assigned to particular category
+     *
+     * @return array of expenses
+     */
+    public function getExpenseCategorySum($expense_category_id, $startDate, $endDate)
+    {
+		$db = static::getDB();
+		
+		$sql = "SELECT expense_category_assigned_to_user_id, IFNULL(SUM(amount), 0) FROM expenses WHERE date_of_expense BETWEEN :startDate AND :endDate AND expense_category_assigned_to_user_id=:expense_category_id GROUP BY expense_category_assigned_to_user_id";
+		
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+		$stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+		$stmt->bindParam(':expense_category_id', $expense_category_id, PDO::PARAM_INT);
+		
+		$stmt->execute();
+		return $stmt->fetch();
+    }
+	
+	/**
+     *	Get expenses category limit information
+     *
+     * @return obejct of expense with limit data
+     */
+    public function getExpenseCategoryLimit($category_id)
+    {
+		$db = static::getDB();
+		
+		$sql = "SELECT id, limit_enabled, expense_category_limit FROM expenses_category_assigned_to_users WHERE user_id=:user_id and id=:category_id";
+		
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		$stmt->bindValue(':category_id', $category_id, PDO::PARAM_INT);
+		
+		$stmt->execute();
+		return $stmt->fetch();
+    }
+	
+	/**
      *	Get incomes assigned to user
      *
      * @return array of incomes

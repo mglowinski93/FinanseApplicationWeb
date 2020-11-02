@@ -34,7 +34,7 @@ class Expense extends Authenticated
      * @return void
      */
     public function newAction()
-    {
+    {	
         View::renderTemplate('Expenses/new.html', [
 			'expense_categories' => $this->user->getExpenseCategories(),
 			'payment_types' => $this->user->getPaymentTypes(),
@@ -67,5 +67,37 @@ class Expense extends Authenticated
 
         header('Content-Type: application/json');
         echo json_encode($is_valid);
+    }
+	
+	/**
+     * Validate if limit is not exceeded within this category
+     *
+     * @return void
+     */
+    public function validateLimitAction()
+    {	
+		$categoryId = $_POST['expenseCategoryId'];
+		$category_limit = $this->user->getExpenseCategoryLimit($categoryId);
+		$current_expense_value = $_POST['expenseValue'];
+		if(empty($current_expense_value))
+		{
+			$current_expense_value = 0;
+		}
+		
+		$startDate = date('Y-m-01');
+		$endDate = date("Y-m-t");
+		$expense_category = $this->user->getExpenseCategoryLimit($categoryId);
+        $expenses_in_current_month_for_category = $this->user->getExpenseCategorySum($categoryId, $startDate, $endDate);
+		$difference = $expense_category['expense_category_limit'] - $current_expense_value;
+
+		if($expenses_in_current_month_for_category)
+		{
+			$difference = $difference - $expenses_in_current_month_for_category[1];
+		}
+		
+		$response = array('limit_enabled' => (bool)$expense_category['limit_enabled'], 'amount_left_to_limit'=> $difference);
+		
+		header('Content-Type: application/json');
+        echo json_encode($response);
     }
 }
