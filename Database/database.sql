@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Czas generowania: 01 Lis 2020, 18:49
+-- Czas generowania: 03 Lis 2020, 16:48
 -- Wersja serwera: 10.4.13-MariaDB
 -- Wersja PHP: 7.4.8
 
@@ -48,7 +48,11 @@ INSERT INTO `expenses` (`id`, `user_id`, `expense_category_assigned_to_user_id`,
 (18, 23, 64, 10, '100.00', '2020-10-24', '0'),
 (19, 23, 68, 10, '8000.00', '2020-10-24', '0'),
 (20, 23, 66, 11, '300.00', '2020-11-01', ''),
-(21, 23, 66, 11, '100.00', '2020-11-01', '');
+(21, 23, 66, 11, '100.00', '2020-11-01', ''),
+(22, 23, 66, 11, '0.03', '2020-11-01', ''),
+(23, 23, 66, 11, '299.99', '2020-11-02', ''),
+(24, 23, 66, 11, '100.00', '2020-11-02', ''),
+(25, 23, 71, 11, '1.00', '2020-11-02', '');
 
 -- --------------------------------------------------------
 
@@ -71,7 +75,7 @@ CREATE TABLE `expenses_category_assigned_to_users` (
 INSERT INTO `expenses_category_assigned_to_users` (`id`, `user_id`, `name`, `limit_enabled`, `expense_category_limit`) VALUES
 (64, 23, 'Transport', 1, '1000'),
 (65, 23, 'Books', 0, '1000'),
-(66, 23, 'Food', 0, '1000'),
+(66, 23, 'Food', 1, '1000'),
 (67, 23, 'Apartments', 0, '1000'),
 (68, 23, 'Telecommunication', 0, '1000'),
 (69, 23, 'Health', 0, '1000'),
@@ -145,7 +149,8 @@ INSERT INTO `incomes` (`id`, `user_id`, `income_category_assigned_to_user_id`, `
 (50, 23, 44, '3000.00', '2020-10-24', '0'),
 (51, 23, 44, '3000.00', '2020-10-23', '0'),
 (52, 23, 44, '200.05', '2020-11-01', ''),
-(53, 23, 44, '200.50', '2020-11-01', '');
+(53, 23, 44, '200.50', '2020-11-01', ''),
+(54, 23, 44, '100.00', '2020-11-02', '');
 
 -- --------------------------------------------------------
 
@@ -345,13 +350,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT dla tabeli `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT dla tabeli `expenses_category_assigned_to_users`
 --
 ALTER TABLE `expenses_category_assigned_to_users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT dla tabeli `expenses_category_default`
@@ -363,13 +368,13 @@ ALTER TABLE `expenses_category_default`
 -- AUTO_INCREMENT dla tabeli `incomes`
 --
 ALTER TABLE `incomes`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT dla tabeli `incomes_category_assigned_to_users`
 --
 ALTER TABLE `incomes_category_assigned_to_users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- AUTO_INCREMENT dla tabeli `incomes_category_default`
@@ -381,7 +386,7 @@ ALTER TABLE `incomes_category_default`
 -- AUTO_INCREMENT dla tabeli `payment_methods_assigned_to_users`
 --
 ALTER TABLE `payment_methods_assigned_to_users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT dla tabeli `payment_methods_default`
