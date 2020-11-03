@@ -2,7 +2,67 @@
 
 {% block title %}Settings{% endblock %}
 
-{% block body %}	
+{% block body %}
+	<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <p>You are about to delete <b><i class="title"></i></b> record, this procedure is irreversible.</p>
+                    <p>Do you want to proceed?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger btn-ok">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+		$.extend({
+			redirectPost: function(location, args)
+			{
+				var form = '';
+				$.each( args, function( key, value ) {
+					form += '<input type="hidden" name="'+key+'" value="'+value+'">';
+				});
+				$('<form action="'+location+'" method="POST">'+form+'</form>').appendTo('body').submit();
+			}
+		});
+		
+        $('#confirm-delete').on('click', '.btn-ok', function(e)
+		{
+            var $modalDiv = $(e.delegateTarget);
+            var id = $(this).data('recordId');
+			var recordCategory = $(this).data('recordCategory');
+			var removeUrl = "";
+			if(recordCategory == "income")
+			{
+				removeUrl = "/profile/income-category-remove";
+			} else if (recordCategory == "expense")
+			{
+				removeUrl = "/profile/expense-category-remove";
+			} else if (recordCategory == "payment")
+			{
+				removeUrl = "/profile/payment-type-remove";
+			}
+			
+            $.redirectPost(removeUrl ,{categoryId: id}).then();
+        });
+		
+        $('#confirm-delete').on('show.bs.modal', function(e)
+		{
+            var data = $(e.relatedTarget).data();
+            $('.title', this).text(data.recordTitle);
+            $('.btn-ok', this).data('recordId', data.recordId);
+			$('.btn-ok', this).data('recordCategory', data.recordCategory);
+        });
+    </script>
+	
 	<div id="settings-display" class="py-5 text-center">
 		<div id="accordion">
             <div class="card">
@@ -55,9 +115,7 @@
 												</form>
 											</td>
 											<td>
-												<form action="/profile/removeIncomeCategory" method="post">
-													<button class="btn btn-danger" name="incomeCategoryIdToRemove" value="{{ income_category.id }}" type="submit">Remove</button>
-												</form>
+												<button class="btn btn-danger" name="incomeCategoryIdToRemove" data-record-category="income" data-record-title="income category {{ income_category.name }}" data-record-id={{ income_category.id }}" data-target="#confirm-delete" data-toggle="modal">Remove</button>
 											</td>
 										</tr>
 									{% endfor %}
@@ -99,9 +157,7 @@
 												</form>
 											</td>
 											<td>
-												<form action="/profile/removeExpenseCategory" method="post">
-													<button class="btn btn-danger" name="expenseCategoryIdToRemove" value="{{ expense_category.id }}" type="submit">Remove</button>
-												</form>
+												<button class="btn btn-danger" name="expenseCategoryIdToRemove" data-record-category="expense" data-record-title="expense category {{ expense_category.name }}" data-record-id={{ expense_category.id }}" data-target="#confirm-delete" data-toggle="modal">Remove</button>
 											</td>
 										</tr>
 									{% endfor %}
@@ -139,9 +195,7 @@
 												</form>
 											</td>
 											<td>
-												<form action="/profile/removePaymentType" method="post">
-													<button class="btn btn-danger" name="paymentTypeIdToRemove" value="{{ payment_type.id }}" type="submit">Remove</button>
-												</form>
+												<button class="btn btn-danger" name="paymentTypeIdToRemove" data-record-category="payment" data-record-title="payment type {{ payment_type.name }}" data-record-id={{ payment_type.id }}" data-target="#confirm-delete" data-toggle="modal">Remove</button>
 											</td>
 										</tr>
 									{% endfor %}

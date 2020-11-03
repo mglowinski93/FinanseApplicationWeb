@@ -627,6 +627,28 @@ class User extends \Core\Model
     }
 	
 	/**
+     * Remove the user's particular income category
+     *
+     * @param array $data Data from the add income category form
+     *
+     * @return boolean True if the data were removed, false otherwise
+     */
+    public function removeIncomeCategory($data)
+    {
+        $incomeCategoryId = $data['categoryId'];
+
+		$sql = "DELETE FROM incomes_category_assigned_to_users WHERE user_id = :user_id AND id = :income_category_id";
+		
+		$db = static::getDB();
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_INT);
+		$stmt->bindValue(':income_category_id', $incomeCategoryId, PDO::PARAM_INT);
+		
+		return $stmt->execute();
+    }
+	
+	/**
      * Update the user's particular expense category
      *
      * @param array $data Data from the edit expense category form
@@ -694,6 +716,28 @@ class User extends \Core\Model
 		$stmt->bindValue(':expense_category_name', $expenseCategoryName, PDO::PARAM_STR);
 		$stmt->bindValue(':limit_enabled', $expenseCategoryLimitEnabled, PDO::PARAM_BOOL);
 		$stmt->bindValue(':expense_category_limit', $expenseCategoryLimit, PDO::PARAM_STR);
+		
+		return $stmt->execute();
+    }
+	
+	/**
+     * Remove the user's particular expense category
+     *
+     * @param array $data Data from the add expense category form
+     *
+     * @return boolean True if the data were removed, false otherwise
+     */
+    public function removeExpenseCategory($data)
+    {
+        $expenseCategoryId = $data['categoryId'];
+
+		$sql = "DELETE FROM expenses_category_assigned_to_users WHERE user_id = :user_id AND id = :expense_category_id";
+		
+		$db = static::getDB();
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_INT);
+		$stmt->bindValue(':expense_category_id', $expenseCategoryId, PDO::PARAM_INT);
 		
 		return $stmt->execute();
     }
@@ -900,6 +944,28 @@ class User extends \Core\Model
 		
 		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_INT);
 		$stmt->bindValue(':payment_type_name', $paymentTypeName, PDO::PARAM_STR);
+		
+		return $stmt->execute();
+    }
+	
+	/**
+     * Remove the user's particular payment type
+     *
+     * @param array $data Data from the add payment type form
+     *
+     * @return boolean True if the data were removed, false otherwise
+     */
+    public function removePaymentType($data)
+    {
+        $paymentTypeId = $data['categoryId'];
+
+		$sql = "DELETE FROM payment_methods_assigned_to_users WHERE user_id = :user_id AND id = :payment_type_id";
+		
+		$db = static::getDB();
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_INT);
+		$stmt->bindValue(':payment_type_id', $paymentTypeId, PDO::PARAM_INT);
 		
 		return $stmt->execute();
     }

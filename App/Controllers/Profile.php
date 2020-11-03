@@ -93,7 +93,7 @@ class Profile extends Authenticated
     }
 	
 	/**
-     * Add the payment type
+     * Add the income category
      *
      * @return void
      */
@@ -105,6 +105,23 @@ class Profile extends Authenticated
 
         } else {
 			Flash::addMessage('Failed to add income category', Flash::INFO);
+        }
+		$this->redirect('/profile/show');
+    }
+	
+	/**
+     * Remove the income category
+     *
+     * @return void
+     */
+    public function incomeCategoryRemoveAction()
+    {	
+        if ($this->user->removeIncomeCategory($_POST)) {
+
+            Flash::addMessage('Income category removed');
+
+        } else {
+			Flash::addMessage('Failed to remove income category', Flash::INFO);
         }
 		$this->redirect('/profile/show');
     }
@@ -150,7 +167,7 @@ class Profile extends Authenticated
     }
 	
 	/**
-     * Add the expense type
+     * Save the expense type
      *
      * @return void
      */
@@ -162,6 +179,23 @@ class Profile extends Authenticated
 
         } else {
 			Flash::addMessage('Failed to add expense category', Flash::INFO);
+        }
+		$this->redirect('/profile/show');
+    }
+	
+	/**
+     * Remove the expense category
+     *
+     * @return void
+     */
+    public function expenseCategoryRemoveAction()
+    {	
+        if ($this->user->removeExpenseCategory($_POST)) {
+
+            Flash::addMessage('Expense category removed');
+
+        } else {
+			Flash::addMessage('Failed to remove expense category', Flash::INFO);
         }
 		$this->redirect('/profile/show');
     }
@@ -218,6 +252,23 @@ class Profile extends Authenticated
 
         } else {
 			Flash::addMessage('Failed to add payment type', Flash::INFO);
+        }
+		$this->redirect('/profile/show');
+    }
+	
+	/**
+     * Remove the payment type
+     *
+     * @return void
+     */
+    public function paymentTypeRemoveAction()
+    {	
+        if ($this->user->removePaymentType($_POST)) {
+
+            Flash::addMessage('Payment type removed');
+
+        } else {
+			Flash::addMessage('Failed to remove payment type', Flash::INFO);
         }
 		$this->redirect('/profile/show');
     }
