@@ -36,7 +36,8 @@ class Profile extends Authenticated
         View::renderTemplate('Profile/show.html', [
             'user' => $this->user,
 			'income_categories' => $this->user->getIncomeCategories(),
-			'expense_categories' => $this->user->getExpenseCategories()
+			'expense_categories' => $this->user->getExpenseCategories(),
+			'payment_types' => $this->user->getPaymentTypes()
         ]);
     }
 
@@ -82,6 +83,33 @@ class Profile extends Authenticated
     }
 	
 	/**
+     * Show add income category page
+     *
+     * @return void
+     */
+    public function incomeCategoryAddAction()
+    {	
+        View::renderTemplate('Profile/add_income_category.html');
+    }
+	
+	/**
+     * Add the payment type
+     *
+     * @return void
+     */
+    public function incomeCategorySaveAction()
+    {	
+        if ($this->user->addIncomeCategory($_POST)) {
+
+            Flash::addMessage('Income category added');
+
+        } else {
+			Flash::addMessage('Failed to add income category', Flash::INFO);
+        }
+		$this->redirect('/profile/show');
+    }
+	
+	/**
      * Show the form for editing the expense category
      *
      * @return void
@@ -107,6 +135,89 @@ class Profile extends Authenticated
         } else {
 
            Flash::addMessage('Failed to save data', Flash::INFO);
+        }
+		$this->redirect('/profile/show');
+    }
+	
+	/**
+     * Show add expense page
+     *
+     * @return void
+     */
+    public function expenseCategoryAddAction()
+    {	
+        View::renderTemplate('Profile/add_expense_category.html');
+    }
+	
+	/**
+     * Add the expense type
+     *
+     * @return void
+     */
+    public function expenseCategorySaveAction()
+    {	
+        if ($this->user->addExpenseCategory($_POST)) {
+
+            Flash::addMessage('Expense category added');
+
+        } else {
+			Flash::addMessage('Failed to add expense category', Flash::INFO);
+        }
+		$this->redirect('/profile/show');
+    }
+	
+	/**
+     * Show the form for editing the payment category
+     *
+     * @return void
+     */
+    public function editPaymentTypeAction()
+    {
+        View::renderTemplate('Profile/edit_payment_type.html', [
+            'payment' => $this->user->getPaymentTypeById($_POST['paymentTypeIdToEdit'])
+        ]);
+    }
+	
+	/**
+     * Update the payment type
+     *
+     * @return void
+     */
+    public function paymentTypeUpdateAction()
+    {
+        if ($this->user->updatePaymentType($_POST)) {
+
+            Flash::addMessage('Changes saved');
+
+        } else {
+			Flash::addMessage('Failed to save data', Flash::INFO);
+        }
+		$this->redirect('/profile/show');
+    }
+	
+	/**
+     * Show add payment page
+     *
+     * @return void
+     */
+    public function paymentTypeAddAction()
+    {	
+        View::renderTemplate('Profile/add_payment_type.html');
+    }
+	
+	/**
+     * Add the payment type
+     *
+     * @return void
+     */
+    public function paymentTypeSaveAction()
+    {	
+        if ($this->user->addPaymentType($_POST)) {
+
+            Flash::addMessage('Payment type added');
+
+        } else {
+			Flash::addMessage('Failed to add payment type', Flash::INFO);
         }
 		$this->redirect('/profile/show');
     }

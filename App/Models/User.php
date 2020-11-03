@@ -517,7 +517,7 @@ class User extends \Core\Model
 	/**
      *	Get particular income category assigned to user
      *
-     * @return array of income categories
+     * @return income category
      */
     public function getIncomeCategoryById($category_id)
     {
@@ -605,6 +605,28 @@ class User extends \Core\Model
     }
 	
 	/**
+     * Add the user's particular income category
+     *
+     * @param array $data Data from the add income category form
+     *
+     * @return boolean True if the data was added, false otherwise
+     */
+    public function addIncomeCategory($data)
+    {
+        $incomeCategoryName = $data['incomeCategoryNewName'];
+
+		$sql = "INSERT INTO incomes_category_assigned_to_users (id, user_id, name) VALUES (NULL, :user_id, :income_category_name)";
+		
+		$db = static::getDB();
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_INT);
+		$stmt->bindValue(':income_category_name', $incomeCategoryName, PDO::PARAM_STR);
+		
+		return $stmt->execute();
+    }
+	
+	/**
      * Update the user's particular expense category
      *
      * @param array $data Data from the edit expense category form
@@ -644,6 +666,39 @@ class User extends \Core\Model
     }
 	
 	/**
+     * Add the user's particular expense category
+     *
+     * @param array $data Data from the add expense category form
+     *
+     * @return boolean True if the data was added, false otherwise
+     */
+    public function addExpenseCategory($data)
+    {
+        $expenseCategoryName = $data['expenseCategoryNewName'];
+		if(isset($data['expenseCategoryLimitEnabled']))
+		{
+			$expenseCategoryLimitEnabled = true;
+		}
+		else
+		{
+			$expenseCategoryLimitEnabled = false;
+		}
+		$expenseCategoryLimit = $data['expenseCategoryNewLimit'];
+
+		$sql = "INSERT INTO expenses_category_assigned_to_users (id, user_id, name, limit_enabled, expense_category_limit) VALUES (NULL, :user_id, :expense_category_name, :limit_enabled, :expense_category_limit)";
+		
+		$db = static::getDB();
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_INT);
+		$stmt->bindValue(':expense_category_name', $expenseCategoryName, PDO::PARAM_STR);
+		$stmt->bindValue(':limit_enabled', $expenseCategoryLimitEnabled, PDO::PARAM_BOOL);
+		$stmt->bindValue(':expense_category_limit', $expenseCategoryLimit, PDO::PARAM_STR);
+		
+		return $stmt->execute();
+    }
+	
+	/**
      *	Get expenses categories assigned to user
      *
      * @return array of expense categories
@@ -663,7 +718,7 @@ class User extends \Core\Model
 	/**
      *	Get particular expense category assigned to user
      *
-     * @return array of expense categories
+     * @return expense category
      */
     public function getExpenseCategoryById($category_id)
     {
@@ -736,6 +791,117 @@ class User extends \Core\Model
 		
 		$stmt->execute();
 		return $stmt->fetchAll();
+    }
+	
+	/**
+     *	Get payment types assigned to user
+     *
+     * @return payment category
+     */
+    public function getPaymentTypeById($payment_id)
+    {
+		$db = static::getDB();
+		$sql = 'SELECT id, name FROM payment_methods_assigned_to_users WHERE user_id = :user_id and id = :payment_id';
+		
+		$stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+		$stmt->bindValue(':payment_id', $payment_id, PDO::PARAM_INT);
+		
+		$stmt->execute();
+		return $stmt->fetch();
+    }
+	
+	/**
+     * Find a payment type by name
+     *
+     * @param string $name payment type name to search for
+     *
+     * @return payment
+     */
+	public function getPaymentTypeByName($name)
+    {
+        $sql = 'SELECT id, name FROM payment_methods_assigned_to_users WHERE user_id = :user_id AND name = :name';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_STR);
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+
+
+        $stmt->execute();
+
+        return $stmt->fetch();
+    }
+	
+	/**
+     * See if a payment type record already exists with the specified name
+     *
+     * @param string $name payment type name to search for
+     * @param string $ignore_id Return false anyway if the record found has this ID
+     *
+     * @return boolean  True if a record already exists with the specified income name, false otherwise
+     */
+    public function paymentTypeNameExists($name, $ignore_id = null)
+    {
+        $payment = $this->getPaymentTypeByName($name);
+
+        if ($payment) {
+            if ($payment['id'] != $ignore_id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+	
+	/**
+     * Update the user's particular payment type
+     *
+     * @param array $data Data from the edit payment type form
+     *
+     * @return boolean  True if the data was updated, false otherwise
+     */
+    public function updatePaymentType($data)
+    {
+        $paymentTypeNewName = $data['paymentTypeNewName'];
+        $paymentTypeIdToEdit = $data['paymentTypeIdToEdit'];
+		$paymentInDatabase = $this->getPaymentTypeById($paymentTypeIdToEdit);
+
+		if($paymentInDatabase['name'] != $paymentTypeNewName)
+		{
+			$sql = 'UPDATE payment_methods_assigned_to_users SET name = :name WHERE id = :id';
+			
+			$db = static::getDB();
+			$stmt = $db->prepare($sql);
+			
+			$stmt->bindValue(':name', $paymentTypeNewName, PDO::PARAM_STR);
+			$stmt->bindValue(':id', $paymentTypeIdToEdit, PDO::PARAM_INT);
+			
+			return $stmt->execute();
+		}
+		return true;
+    }
+	
+	/**
+     * Add the user's particular payment type
+     *
+     * @param array $data Data from the add payment type form
+     *
+     * @return boolean  True if the data was added, false otherwise
+     */
+    public function addPaymentType($data)
+    {
+        $paymentTypeName = $data['paymentTypeNewName'];
+
+		$sql = "INSERT INTO payment_methods_assigned_to_users (id, user_id, name) VALUES (NULL, :user_id, :payment_type_name)";
+		
+		$db = static::getDB();
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':user_id', $this->id, PDO::PARAM_INT);
+		$stmt->bindValue(':payment_type_name', $paymentTypeName, PDO::PARAM_STR);
+		
+		return $stmt->execute();
     }
 	
 	/**

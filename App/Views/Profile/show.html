@@ -41,7 +41,8 @@
 								<thead>
 									<tr>
 										<th scope="col">Income category</th>
-										<th scope="col">Edit</th>
+										<th scope="col" style="width: 10%"></th>
+										<th scope="col" style="width: 10%"></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -53,10 +54,16 @@
 													<button class="btn btn-primary" name="incomeCategoryIdToEdit" value="{{ income_category.id }}" type="submit">Edit</button>
 												</form>
 											</td>
+											<td>
+												<form action="/profile/removeIncomeCategory" method="post">
+													<button class="btn btn-danger" name="incomeCategoryIdToRemove" value="{{ income_category.id }}" type="submit">Remove</button>
+												</form>
+											</td>
 										</tr>
 									{% endfor %}
 								</tbody>
 							</table>
+							<button class="btn btn-primary" onclick="location.href='/profile/incomeCategoryAdd'" type="button">Add income category</button>
 						</div>
 					</div>
 				</div>
@@ -76,7 +83,8 @@
 										<th scope="col">Expense category</th>
 										<th scope="col">Limit Enabled</th>
 										<th scope="col">Limit</th>
-										<th scope="col">Edit</th>
+										<th scope="col" style="width: 10%"></th>
+										<th scope="col" style="width: 10%"></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -90,10 +98,56 @@
 													<button class="btn btn-primary" name="expenseCategoryIdToEdit" value="{{ expense_category.id }}" type="submit">Edit</button>
 												</form>
 											</td>
+											<td>
+												<form action="/profile/removeExpenseCategory" method="post">
+													<button class="btn btn-danger" name="expenseCategoryIdToRemove" value="{{ expense_category.id }}" type="submit">Remove</button>
+												</form>
+											</td>
 										</tr>
 									{% endfor %}
 								</tbody>
 							</table>
+							<button class="btn btn-primary" onclick="location.href='/profile/expenseCategoryAdd'" type="button">Add expense category</button>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-header" id="headingEditPayments">
+					<h5 class="mb-0">
+						<button class="btn btn-link collapsed" data-toggle="collapse" data-target="#editPayments" aria-expanded="false" aria-controls="editPayments">
+							Payments Settings
+						</button>
+					</h5>
+					</div>
+					<div id="editPayments" class="collapse" aria-labelledby="headingEditPayments" data-parent="#accordion">
+						<div class="card-body">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th scope="col">Payment category</th>
+										<th scope="col" style="width: 10%"></th>
+										<th scope="col" style="width: 10%"></th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for payment_type in payment_types %}
+										<tr>
+											<td>{{ payment_type.name }}</td>
+											<td>
+												<form action="/profile/editPaymentType" method="post">
+													<button class="btn btn-primary" name="paymentTypeIdToEdit" value="{{ payment_type.id }}" type="submit">Edit</button>
+												</form>
+											</td>
+											<td>
+												<form action="/profile/removePaymentType" method="post">
+													<button class="btn btn-danger" name="paymentTypeIdToRemove" value="{{ payment_type.id }}" type="submit">Remove</button>
+												</form>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+							<button class="btn btn-primary" onclick="location.href='/profile/paymentTypeAdd'" type="button">Add payment category</button>
 						</div>
 					</div>
 				</div>
