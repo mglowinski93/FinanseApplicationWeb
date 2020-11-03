@@ -23,16 +23,15 @@
 					if(data.limit_enabled)
 					{	
 						$("#limitAlert").addClass("alert text-center");
-						
 						if(data.amount_left_to_limit >= 0)
-						{
+						{	
 							message = "This expense is within limit";
-							$("#limitAlert").addClass("alert-success");
+							$("#limitAlert").removeClass("alert-danger").addClass("alert-success");
 						}
 						else
 						{
 							message = "This expense is above limit!";
-							$("#limitAlert").addClass("alert-danger");
+							$("#limitAlert").removeClass("alert-success").addClass("alert-danger");
 						}
 					}
 					else
