@@ -76,18 +76,19 @@ class Expense extends Authenticated
      */
     public function validateLimitAction()
     {	
-		$categoryId = $_POST['expenseCategoryId'];
-		$category_limit = $this->user->getExpenseCategoryLimit($categoryId);
+		$category_id = $_POST['expenseCategoryId'];
+		$category_limit = $this->user->getExpenseCategoryLimit($category_id);
 		$current_expense_value = $_POST['expenseValue'];
+		$expense_date = $_POST['expenseDate'];
 		if(empty($current_expense_value))
 		{
 			$current_expense_value = 0;
 		}
 		
-		$startDate = date('Y-m-01');
-		$endDate = date("Y-m-t");
-		$expense_category = $this->user->getExpenseCategoryLimit($categoryId);
-        $expenses_in_current_month_for_category = $this->user->getExpenseCategorySum($categoryId, $startDate, $endDate);
+		$start_date = date('Y-m-01', strtotime($expense_date));
+		$end_date = date('Y-m-t', strtotime($expense_date));
+		$expense_category = $this->user->getExpenseCategoryLimit($category_id);
+        $expenses_in_current_month_for_category = $this->user->getExpenseCategorySum($category_id, $start_date, $end_date);
 		$difference = $expense_category['expense_category_limit'] - $current_expense_value;
 
 		if($expenses_in_current_month_for_category)

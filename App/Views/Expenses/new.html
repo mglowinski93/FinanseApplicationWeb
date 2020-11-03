@@ -12,13 +12,15 @@
 		{
 			var expenseValue = $("#expenseValue").val();
 			var expenseCategoryId = $('input[name ="expenseCategory"]:checked').val();
+			var expenseDate = $("#expenseDate").val();
 			
-			$.post("validate-limit", 
+			$.post("/expense/validate-limit", 
 			{
 				expenseCategoryId: expenseCategoryId,
-				expenseValue: expenseValue
+				expenseValue: expenseValue,
+				expenseDate: expenseDate
 			}, function(data)
-				{	
+				{
 					var message = "";
 					if(data.limit_enabled)
 					{	
