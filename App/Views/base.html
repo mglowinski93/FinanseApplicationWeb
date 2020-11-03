@@ -12,16 +12,16 @@
     <link href="/css/main.css" rel="stylesheet">
     <link href="/css/modal.css" rel="stylesheet">
     <link href="/css/fontello.css" rel="stylesheet">
-	
-	{% block head %}{% endblock %}
-
 
     <script type="text/javascript" src="/js/main.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 	
+	{% block head %}{% endblock %}
 	
 	<title>Finance App {% block title %}{% endblock %}</title>
 </head>
@@ -119,9 +119,6 @@
 	
 	{% block body %}
 	{% endblock %}
-
-	<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
-	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
 	
     {% block footer %}
 		<footer class="container text-center">

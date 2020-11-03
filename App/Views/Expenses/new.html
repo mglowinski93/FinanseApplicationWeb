@@ -2,6 +2,52 @@
 
 {% block title %}Add Expense{% endblock %}
 
+{% block head %}
+	{{ parent() }}
+	
+<script>
+	$(document).ready(function()
+	{
+		$("input").change(function()
+		{
+			var expenseValue = $("#expenseValue").val();
+			var expenseCategoryId = $('input[name ="expenseCategory"]:checked').val();
+			var expenseDate = $("#expenseDate").val();
+			
+			$.post("/expense/validate-limit", 
+			{
+				expenseCategoryId: expenseCategoryId,
+				expenseValue: expenseValue,
+				expenseDate: expenseDate
+			}, function(data)
+				{
+					var message = "";
+					if(data.limit_enabled)
+					{	
+						$("#limitAlert").addClass("alert text-center");
+						if(data.amount_left_to_limit >= 0)
+						{	
+							message = "This expense is within limit";
+							$("#limitAlert").removeClass("alert-danger").addClass("alert-success");
+						}
+						else
+						{
+							message = "This expense is above limit!";
+							$("#limitAlert").removeClass("alert-success").addClass("alert-danger");
+						}
+					}
+					else
+					{
+						$("#limitAlert").removeClass("alert alert-danger alert-success text-center");
+					}
+					$("#limitAlert").html(message);
+					
+				});
+		});
+	});
+</script>
+{% endblock %}
+
 {% block load_javascript_functions %}setExpenseTodaysDateInCalendar();{% endblock %}
 
 {% block pre_money_form %}
@@ -55,6 +101,8 @@
 			<div class="col-sm-5">
 				<input type="date" class="form-control" id="expenseDate" name="expenseDate" required>
 			</div>
+		</div>
+		<div id="limitAlert" role="alert">
 		</div>
 		<div class="form-group row">
 			<div class="col-6 text-left">
