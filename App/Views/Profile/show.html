@@ -110,12 +110,16 @@
 										<tr>
 											<td>{{ income_category.name }}</td>
 											<td>
-												<form action="/profile/editIncomeCategory" method="post">
-													<button class="btn btn-primary" name="incomeCategoryIdToEdit" value="{{ income_category.id }}" type="submit">Edit</button>
-												</form>
+												{% if income_category.name != "Another" %}
+													<form action="/profile/editIncomeCategory" method="post">
+														<button class="btn btn-primary" name="incomeCategoryIdToEdit" value="{{ income_category.id }}" type="submit">Edit</button>
+													</form>
+												{% endif %}
 											</td>
 											<td>
-												<button class="btn btn-danger" name="incomeCategoryIdToRemove" data-record-category="income" data-record-title="income category {{ income_category.name }}" data-record-id={{ income_category.id }}" data-target="#confirm-delete" data-toggle="modal">Remove</button>
+												{% if income_category.name != "Another" %}
+													<button class="btn btn-danger" name="incomeCategoryIdToRemove" data-record-category="income" data-record-title="income category {{ income_category.name }}" data-record-id={{ income_category.id }}" data-target="#confirm-delete" data-toggle="modal">Remove</button>
+												{% endif %}
 											</td>
 										</tr>
 									{% endfor %}
@@ -152,12 +156,16 @@
 											<td>{% if expense_category.limit_enabled %}Enabled{% else %}Disabled{% endif %}</td>
 											<td>{{ expense_category.expense_category_limit }}</td>
 											<td>
-												<form action="/profile/editExpenseCategory" method="post">
-													<button class="btn btn-primary" name="expenseCategoryIdToEdit" value="{{ expense_category.id }}" type="submit">Edit</button>
-												</form>
+												{% if expense_category.name != "Another" %}
+													<form action="/profile/editExpenseCategory" method="post">
+														<button class="btn btn-primary" name="expenseCategoryIdToEdit" value="{{ expense_category.id }}" type="submit">Edit</button>
+													</form>
+												{% endif %}
 											</td>
 											<td>
-												<button class="btn btn-danger" name="expenseCategoryIdToRemove" data-record-category="expense" data-record-title="expense category {{ expense_category.name }}" data-record-id={{ expense_category.id }}" data-target="#confirm-delete" data-toggle="modal">Remove</button>
+												{% if expense_category.name != "Another" %}
+													<button class="btn btn-danger" name="expenseCategoryIdToRemove" data-record-category="expense" data-record-title="expense category {{ expense_category.name }}" data-record-id={{ expense_category.id }}" data-target="#confirm-delete" data-toggle="modal">Remove</button>
+												{% endif %}
 											</td>
 										</tr>
 									{% endfor %}
@@ -190,12 +198,16 @@
 										<tr>
 											<td>{{ payment_type.name }}</td>
 											<td>
-												<form action="/profile/editPaymentType" method="post">
-													<button class="btn btn-primary" name="paymentTypeIdToEdit" value="{{ payment_type.id }}" type="submit">Edit</button>
-												</form>
+												{% if payment_type.name != "Another" %}
+													<form action="/profile/editPaymentType" method="post">
+														<button class="btn btn-primary" name="paymentTypeIdToEdit" value="{{ payment_type.id }}" type="submit">Edit</button>
+													</form>
+												{% endif %}
 											</td>
 											<td>
-												<button class="btn btn-danger" name="paymentTypeIdToRemove" data-record-category="payment" data-record-title="payment type {{ payment_type.name }}" data-record-id={{ payment_type.id }}" data-target="#confirm-delete" data-toggle="modal">Remove</button>
+												{% if payment_type.name != "Another" %}
+													<button class="btn btn-danger" name="paymentTypeIdToRemove" data-record-category="payment" data-record-title="payment type {{ payment_type.name }}" data-record-id={{ payment_type.id }}" data-target="#confirm-delete" data-toggle="modal">Remove</button>
+												{% endif %}
 											</td>
 										</tr>
 									{% endfor %}

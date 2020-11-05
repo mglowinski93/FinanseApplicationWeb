@@ -627,6 +627,28 @@ class User extends \Core\Model
     }
 	
 	/**
+     * Reassign the user's particular income type to Another category
+     *
+     * @param string with income name to exchange
+     *
+     * @return boolean True if the data were removed, false otherwise
+     */
+    public function reassignIncomeCategoryToAnother($income_category_id)
+    {
+		$sql = "UPDATE incomes SET income_category_assigned_to_user_id = :another_category_id WHERE income_category_assigned_to_user_id = :income_category_id";
+		
+		$another_category_id = $this->getIncomeCategoryByName("Another")['id'];
+		
+		$db = static::getDB();
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':income_category_id', $income_category_id, PDO::PARAM_INT);
+		$stmt->bindValue(':another_category_id', $another_category_id, PDO::PARAM_INT);
+		
+		return $stmt->execute();
+    }
+	
+	/**
      * Remove the user's particular income category
      *
      * @param array $data Data from the add income category form
@@ -636,7 +658,9 @@ class User extends \Core\Model
     public function removeIncomeCategory($data)
     {
         $incomeCategoryId = $data['categoryId'];
-
+		
+		$this->reassignIncomeCategoryToAnother($incomeCategoryId);
+		
 		$sql = "DELETE FROM incomes_category_assigned_to_users WHERE user_id = :user_id AND id = :income_category_id";
 		
 		$db = static::getDB();
@@ -721,6 +745,28 @@ class User extends \Core\Model
     }
 	
 	/**
+     * Reassign the user's particular expense type to Another category
+     *
+     * @param string with expense name to exchange
+     *
+     * @return boolean True if the data were removed, false otherwise
+     */
+    public function reassignExpenseCategoryToAnother($expense_category_id)
+    {
+		$sql = "UPDATE expenses SET expense_category_assigned_to_user_id = :another_category_id WHERE expense_category_assigned_to_user_id = :expense_category_id";
+		
+		$another_category_id = $this->getExpenseCategoryByName("Another")['id'];
+		
+		$db = static::getDB();
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':expense_category_id', $expense_category_id, PDO::PARAM_INT);
+		$stmt->bindValue(':another_category_id', $another_category_id, PDO::PARAM_INT);
+		
+		return $stmt->execute();
+    }
+	
+	/**
      * Remove the user's particular expense category
      *
      * @param array $data Data from the add expense category form
@@ -730,7 +776,9 @@ class User extends \Core\Model
     public function removeExpenseCategory($data)
     {
         $expenseCategoryId = $data['categoryId'];
-
+		
+		$this->reassignExpenseCategoryToAnother($expenseCategoryId);
+		
 		$sql = "DELETE FROM expenses_category_assigned_to_users WHERE user_id = :user_id AND id = :expense_category_id";
 		
 		$db = static::getDB();
@@ -949,6 +997,28 @@ class User extends \Core\Model
     }
 	
 	/**
+     * Reassign the user's particular payment type to Another category
+     *
+     * @param string with payment type to exchange
+     *
+     * @return boolean True if the data were removed, false otherwise
+     */
+    public function reassignPaymentTypeToAnother($payment_type_id)
+    {
+		$sql = "UPDATE expenses SET payment_method_assigned_to_user_id = :another_type_id WHERE payment_method_assigned_to_user_id = :payment_type_id";
+		
+		$another_type_id = $this->getPaymentTypeByName("Another")['id'];
+		
+		$db = static::getDB();
+		$stmt = $db->prepare($sql);
+		
+		$stmt->bindValue(':payment_type_id', $payment_type_id, PDO::PARAM_INT);
+		$stmt->bindValue(':another_type_id', $another_type_id, PDO::PARAM_INT);
+		
+		return $stmt->execute();
+    }
+	
+	/**
      * Remove the user's particular payment type
      *
      * @param array $data Data from the add payment type form
@@ -958,7 +1028,9 @@ class User extends \Core\Model
     public function removePaymentType($data)
     {
         $paymentTypeId = $data['categoryId'];
-
+		
+		$this->reassignPaymentTypeToAnother($paymentTypeId);
+		
 		$sql = "DELETE FROM payment_methods_assigned_to_users WHERE user_id = :user_id AND id = :payment_type_id";
 		
 		$db = static::getDB();
