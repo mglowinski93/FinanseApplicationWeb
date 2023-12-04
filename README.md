@@ -1,4 +1,4 @@
-# Finanse Application Web
+# Finanse web application
 
 Application to manage private finances.
 
